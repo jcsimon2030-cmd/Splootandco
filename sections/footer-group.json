@@ -1,0 +1,21 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Join the pack",
+        "subheading": "First looks, drops, and packwide signal. No spam."
+      }
+    },
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "menu": "footer",
+        "tagline": "Heavy armor for soft hearts."
+      }
+    }
+  },
+  "order": ["newsletter", "footer"]
+}

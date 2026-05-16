@@ -1,0 +1,14 @@
+<article class="page" data-section-id="{{ section.id }}">
+  <div class="container container--narrow">
+    <header class="page__head">
+      <h1 class="page__title">{{ page.title }}</h1>
+    </header>
+    <div class="page__body rte">{{ page.content }}</div>
+  </div>
+</article>
+
+{% schema %}
+{
+  "name": "Page"
+}
+{% endschema %}

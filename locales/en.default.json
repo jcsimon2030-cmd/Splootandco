@@ -1,0 +1,87 @@
+{
+  "general": {
+    "meta": {
+      "tags": "Tagged: {{ tags }}",
+      "page": "Page {{ page }}"
+    },
+    "search": {
+      "placeholder": "Search the armory…",
+      "no_results": "Nothing in the pack matches \"{{ terms }}\".",
+      "results_with_count": {
+        "one": "{{ count }} result for \"{{ terms }}\"",
+        "other": "{{ count }} results for \"{{ terms }}\""
+      },
+      "title": "Search"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "newsletter": {
+      "heading": "Join the pack",
+      "subheading": "First looks, drops, and packwide signal. No spam.",
+      "label": "Email",
+      "placeholder": "you@somewhere.com",
+      "submit": "Subscribe",
+      "success": "You're in."
+    },
+    "404": {
+      "title": "Lost in the woods",
+      "subtitle": "That page wandered off.",
+      "link": "Back to the armory"
+    }
+  },
+  "accessibility": {
+    "skip_to_content": "Skip to content",
+    "menu": "Menu",
+    "close": "Close",
+    "cart": "Cart",
+    "search": "Search",
+    "previous": "Previous",
+    "next": "Next",
+    "quantity": "Quantity"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to cart",
+      "sold_out": "Sold out",
+      "unavailable": "Unavailable",
+      "quantity": "Quantity",
+      "details": "Details",
+      "shipping": "Shipping & returns",
+      "from_price": "From {{ price }}"
+    },
+    "card": {
+      "from": "From"
+    },
+    "facets": {
+      "filter_by": "Filter",
+      "sort_by": "Sort",
+      "clear_all": "Clear all"
+    }
+  },
+  "cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty.",
+    "continue_shopping": "Continue shopping",
+    "checkout": "Checkout",
+    "subtotal": "Subtotal",
+    "taxes_and_shipping": "Taxes and shipping calculated at checkout.",
+    "remove": "Remove",
+    "quantity": "Quantity",
+    "edit": "Edit"
+  },
+  "collections": {
+    "general": {
+      "view_all": "View all",
+      "no_matches": "No products in this collection yet."
+    }
+  },
+  "blogs": {
+    "article": {
+      "read_more": "Read more",
+      "by_author": "By {{ author }}",
+      "on_date": "{{ date }}"
+    }
+  }
+}

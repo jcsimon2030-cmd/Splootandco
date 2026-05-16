@@ -1,0 +1,54 @@
+<section class="iwt iwt--{{ section.settings.layout }}" data-section-id="{{ section.id }}">
+  <div class="container iwt__inner">
+    <div class="iwt__media">
+      {%- if section.settings.image -%}
+        <img
+          src="{{ section.settings.image | image_url: width: 1200 }}"
+          alt="{{ section.settings.image.alt | escape | default: section.settings.heading }}"
+          width="{{ section.settings.image.width }}"
+          height="{{ section.settings.image.height }}"
+          loading="lazy">
+      {%- else -%}
+        {{ 'lifestyle-1' | placeholder_svg_tag }}
+      {%- endif -%}
+    </div>
+    <div class="iwt__text">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="iwt__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2 class="iwt__heading">{{ section.settings.heading }}</h2>
+      <div class="iwt__body rte">{{ section.settings.body }}</div>
+      {%- if section.settings.cta_label != blank -%}
+        <a href="{{ section.settings.cta_link }}" class="btn btn--outline">{{ section.settings.cta_label }}</a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Image with text",
+  "settings": [
+    { "type": "image_picker", "id": "image",      "label": "Image" },
+    { "type": "text",         "id": "eyebrow",    "label": "Eyebrow", "default": "About" },
+    { "type": "text",         "id": "heading",    "label": "Heading", "default": "Built for the pack" },
+    { "type": "richtext",     "id": "body",       "label": "Body",
+      "default": "<p>Heavyweight cotton. Distressed woodcut graphics. Garments that hold up to long walks, hard days, and short tempers.</p>" },
+    { "type": "text",         "id": "cta_label",  "label": "Button label", "default": "Read more" },
+    { "type": "url",          "id": "cta_link",   "label": "Button link" },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Image position",
+      "options": [
+        { "value": "left",  "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    }
+  ],
+  "presets": [
+    { "name": "Image with text" }
+  ]
+}
+{% endschema %}

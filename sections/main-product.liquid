@@ -1,0 +1,123 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign featured = current_variant.featured_media | default: product.featured_media
+-%}
+
+<section class="product" data-section-id="{{ section.id }}" data-product-id="{{ product.id }}">
+  <div class="container product__layout">
+
+    <div class="product__media">
+      <div class="product__media-main">
+        {%- if featured -%}
+          <img
+            src="{{ featured.preview_image | image_url: width: 1400 }}"
+            srcset="{{ featured.preview_image | image_url: width: 700 }} 700w,
+                    {{ featured.preview_image | image_url: width: 1100 }} 1100w,
+                    {{ featured.preview_image | image_url: width: 1600 }} 1600w"
+            sizes="(min-width: 990px) 50vw, 100vw"
+            alt="{{ featured.alt | escape | default: product.title }}"
+            width="{{ featured.preview_image.width }}"
+            height="{{ featured.preview_image.height }}">
+        {%- endif -%}
+      </div>
+
+      {%- if product.media.size > 1 -%}
+        <div class="product__media-thumbs">
+          {%- for media in product.media -%}
+            <button type="button" class="product__thumb" data-media-id="{{ media.id }}">
+              <img src="{{ media.preview_image | image_url: width: 200 }}" alt="" width="100" height="100" loading="lazy">
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="product__info">
+      {%- if product.vendor != blank -%}
+        <p class="product__vendor">{{ product.vendor }}</p>
+      {%- endif -%}
+
+      <h1 class="product__title">{{ product.title }}</h1>
+
+      <div class="product__price">
+        {%- render 'price', product: product, use_variant: true -%}
+      </div>
+
+      <product-form data-product-id="{{ product.id }}">
+        {%- form 'product', product, class: 'product__form', id: 'ProductForm' -%}
+          <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
+
+          {%- unless product.has_only_default_variant -%}
+            <div class="product__options">
+              {%- for option in product.options_with_values -%}
+                <fieldset class="product__option" data-option-index="{{ forloop.index0 }}">
+                  <legend class="product__option-name">{{ option.name }}</legend>
+                  <div class="product__option-values">
+                    {%- for value in option.values -%}
+                      {%- assign id = 'opt-' | append: section.id | append: '-' | append: forloop.parentloop.index0 | append: '-' | append: forloop.index0 -%}
+                      <input
+                        type="radio"
+                        id="{{ id }}"
+                        name="options[{{ option.name | escape }}]"
+                        value="{{ value | escape }}"
+                        {% if option.selected_value == value %}checked{% endif %}>
+                      <label for="{{ id }}" class="product__swatch">{{ value }}</label>
+                    {%- endfor -%}
+                  </div>
+                </fieldset>
+              {%- endfor -%}
+            </div>
+          {%- endunless -%}
+
+          <div class="product__buy">
+            <label class="product__qty">
+              <span class="visually-hidden">{{ 'accessibility.quantity' | t }}</span>
+              <input type="number" name="quantity" value="1" min="1" inputmode="numeric">
+            </label>
+            <button
+              type="submit"
+              name="add"
+              class="btn btn--solid btn--lg product__add"
+              {% unless current_variant.available %}disabled{% endunless %}>
+              <span data-add-label>
+                {% if current_variant.available %}{{ 'products.product.add_to_cart' | t }}{% else %}{{ 'products.product.sold_out' | t }}{% endif %}
+              </span>
+            </button>
+          </div>
+        {%- endform -%}
+      </product-form>
+
+      {%- if product.description != blank -%}
+        <details class="product__details" open>
+          <summary>{{ 'products.product.details' | t }}</summary>
+          <div class="rte">{{ product.description }}</div>
+        </details>
+      {%- endif -%}
+
+      {%- if section.settings.shipping_text != blank -%}
+        <details class="product__details">
+          <summary>{{ 'products.product.shipping' | t }}</summary>
+          <div class="rte">{{ section.settings.shipping_text }}</div>
+        </details>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script type="application/json" data-product-json>
+  {{ product | json }}
+</script>
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "shipping_text",
+      "label": "Shipping & returns copy",
+      "default": "<p>Heavyweight cotton. Ships in 5–10 business days from a print partner. Free shipping on orders over $100.</p>"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,73 @@
+<section class="cart" data-section-id="{{ section.id }}">
+  <div class="container">
+    <header class="cart__head">
+      <h1 class="cart__title">{{ 'cart.title' | t }}</h1>
+    </header>
+
+    {%- if cart.item_count > 0 -%}
+      <form action="{{ routes.cart_url }}" method="post" class="cart__form" novalidate>
+        <table class="cart__table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>{{ 'cart.quantity' | t }}</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for item in cart.items -%}
+              <tr class="cart__row">
+                <td class="cart__product">
+                  <a href="{{ item.url }}" class="cart__media">
+                    {%- if item.image -%}
+                      <img src="{{ item.image | image_url: width: 220 }}" alt="{{ item.title | escape }}" width="110" height="110" loading="lazy">
+                    {%- endif -%}
+                  </a>
+                  <div class="cart__detail">
+                    <a href="{{ item.url }}" class="cart__name">{{ item.product.title }}</a>
+                    {%- unless item.product.has_only_default_variant -%}
+                      <small class="cart__variant">{{ item.variant.title }}</small>
+                    {%- endunless -%}
+                    <small class="cart__price">{{ item.final_price | money }}</small>
+                  </div>
+                </td>
+                <td class="cart__qty-cell">
+                  <input type="number"
+                    name="updates[]"
+                    value="{{ item.quantity }}"
+                    min="0"
+                    inputmode="numeric"
+                    aria-label="{{ 'accessibility.quantity' | t }}">
+                  <a href="{{ item.url_to_remove }}" class="cart__remove">{{ 'cart.remove' | t }}</a>
+                </td>
+                <td class="cart__line-total">{{ item.final_line_price | money }}</td>
+              </tr>
+            {%- endfor -%}
+          </tbody>
+        </table>
+
+        <div class="cart__footer">
+          <div class="cart__totals">
+            <div><span>{{ 'cart.subtotal' | t }}</span><strong>{{ cart.total_price | money }}</strong></div>
+            <p class="cart__note">{{ 'cart.taxes_and_shipping' | t }}</p>
+          </div>
+          <div class="cart__actions">
+            <button type="submit" name="update" class="btn btn--outline">Update</button>
+            <button type="submit" name="checkout" class="btn btn--solid">{{ 'cart.checkout' | t }}</button>
+          </div>
+        </div>
+      </form>
+    {%- else -%}
+      <div class="cart__empty">
+        <p>{{ 'cart.empty' | t }}</p>
+        <a href="{{ routes.collections_url }}" class="btn btn--solid">{{ 'cart.continue_shopping' | t }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Cart"
+}
+{% endschema %}

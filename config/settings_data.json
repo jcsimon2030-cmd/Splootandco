@@ -1,0 +1,22 @@
+{
+  "current": {
+    "logo_width": 120,
+    "color_bg": "#0B0B0B",
+    "color_fg": "#F4EFE6",
+    "color_accent": "#B5471A",
+    "color_muted": "#8C8275",
+    "color_line": "#2A2A2A",
+    "type_body_font": "assistant_n4",
+    "type_heading_font": "archivo_n9",
+    "headings_uppercase": true,
+    "container_width": 1440,
+    "card_style": "edge"
+  },
+  "presets": {
+    "Sploot — Default": {
+      "color_bg": "#0B0B0B",
+      "color_fg": "#F4EFE6",
+      "color_accent": "#B5471A"
+    }
+  }
+}

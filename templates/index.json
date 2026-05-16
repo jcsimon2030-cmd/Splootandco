@@ -1,0 +1,66 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "Drop 01 · Heavy Armor",
+        "heading": "Stay soft. Stay feral.",
+        "subheading": "Heavyweight cotton. Distressed woodcut graphics. Built for the days you need to be tender and terrifying in the same breath.",
+        "cta_label": "Enter the armory",
+        "cta_link": "shopify://collections/all",
+        "height": "tall",
+        "text_align": "left"
+      }
+    },
+    "featured_drop": {
+      "type": "featured-collection",
+      "settings": {
+        "eyebrow": "Newly forged",
+        "heading": "From the armory",
+        "collection": "all",
+        "limit": 8,
+        "cols": "4"
+      }
+    },
+    "collections": {
+      "type": "collection-list",
+      "settings": {
+        "eyebrow": "Browse",
+        "heading": "Pick your armor"
+      },
+      "blocks": {
+        "c1": { "type": "collection", "settings": { "collection": "heavy-armor" } },
+        "c2": { "type": "collection", "settings": { "collection": "light-armor" } },
+        "c3": { "type": "collection", "settings": { "collection": "love-is-dead" } },
+        "c4": { "type": "collection", "settings": { "collection": "dumb-bells" } }
+      },
+      "block_order": ["c1", "c2", "c3", "c4"]
+    },
+    "manifesto": {
+      "type": "manifesto",
+      "settings": {
+        "eyebrow": "The credo",
+        "body": "<p>The internet wants you to be a lone wolf. The internet is a sales funnel. <em>We are the pack.</em> Stay soft. Stay feral. Wear the armor.</p>",
+        "signature": "Sploot & Co"
+      }
+    },
+    "image_with_text": {
+      "type": "image-with-text",
+      "settings": {
+        "eyebrow": "About",
+        "heading": "Built for the pack",
+        "body": "<p>Every garment is a small woodcut prayer for soft hearts who refuse to apologize. Premium heavyweight cotton. Distressed graphics. Made to last.</p>",
+        "cta_label": "Our story",
+        "cta_link": "/pages/about",
+        "layout": "right"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "featured_drop",
+    "collections",
+    "manifesto",
+    "image_with_text"
+  ]
+}

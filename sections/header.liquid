@@ -1,0 +1,66 @@
+<site-header class="header{% if section.settings.sticky %} header--sticky{% endif %}" data-section-id="{{ section.id }}">
+  <div class="header__inner container">
+    <button type="button" class="header__menu-toggle" aria-controls="MobileNav" aria-expanded="false">
+      {% render 'icon-menu' %}
+      <span class="visually-hidden">{{ 'accessibility.menu' | t }}</span>
+    </button>
+
+    <a href="{{ routes.root_url }}" class="header__logo">
+      {%- if settings.logo != blank -%}
+        <img
+          src="{{ settings.logo | image_url: width: settings.logo_width | times: 2 }}"
+          alt="{{ shop.name }}"
+          width="{{ settings.logo_width }}"
+          height="{{ settings.logo_width | divided_by: settings.logo.aspect_ratio | round }}">
+      {%- else -%}
+        <span class="header__wordmark">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    <nav class="header__nav" aria-label="Primary">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <a href="{{ link.url }}" class="header__nav-link{% if link.active %} is-active{% endif %}">
+          {{ link.title }}
+        </a>
+      {%- endfor -%}
+    </nav>
+
+    <div class="header__actions">
+      <a href="{{ routes.search_url }}" class="header__action" aria-label="{{ 'accessibility.search' | t }}">
+        {% render 'icon-search' %}
+      </a>
+      <a href="{{ routes.cart_url }}" class="header__action header__cart" data-cart-toggle aria-label="{{ 'accessibility.cart' | t }}">
+        {% render 'icon-cart' %}
+        <span class="header__cart-count" data-cart-count>{{ cart.item_count }}</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="header__mobile-nav" id="MobileNav" hidden>
+    <nav aria-label="Mobile">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <a href="{{ link.url }}" class="header__mobile-link">{{ link.title }}</a>
+      {%- endfor -%}
+    </nav>
+  </div>
+</site-header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "main-menu",
+      "label": "Menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "default": true,
+      "label": "Sticky header"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,58 @@
+{%- liquid
+  assign collection = collections[section.settings.collection]
+  assign limit = section.settings.limit
+-%}
+
+<section class="featured-collection" data-section-id="{{ section.id }}">
+  <div class="container">
+    <header class="section-head">
+      <p class="section-head__eyebrow">{{ section.settings.eyebrow }}</p>
+      <h2 class="section-head__title">{{ section.settings.heading | default: collection.title }}</h2>
+      {%- if collection != blank -%}
+        <a class="section-head__link" href="{{ collection.url }}">{{ 'collections.general.view_all' | t }} →</a>
+      {%- endif -%}
+    </header>
+
+    {%- if collection.products.size > 0 -%}
+      <div class="product-grid product-grid--cols-{{ section.settings.cols }}">
+        {%- for product in collection.products limit: limit -%}
+          {% render 'product-card', product: product %}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <p class="empty">{{ 'collections.general.no_matches' | t }}</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "settings": [
+    { "type": "text",       "id": "eyebrow",    "label": "Eyebrow", "default": "From the armory" },
+    { "type": "text",       "id": "heading",    "label": "Heading", "default": "" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 2, "max": 12, "step": 1,
+      "label": "Products to show",
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "cols",
+      "label": "Columns (desktop)",
+      "options": [
+        { "value": "2", "label": "2" },
+        { "value": "3", "label": "3" },
+        { "value": "4", "label": "4" }
+      ],
+      "default": "4"
+    }
+  ],
+  "presets": [
+    { "name": "Featured collection" }
+  ]
+}
+{% endschema %}

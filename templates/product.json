@@ -1,0 +1,16 @@
+{
+  "sections": {
+    "main": { "type": "main-product" },
+    "related": {
+      "type": "featured-collection",
+      "settings": {
+        "eyebrow": "More armor",
+        "heading": "You might also like",
+        "collection": "all",
+        "limit": 4,
+        "cols": "4"
+      }
+    }
+  },
+  "order": ["main", "related"]
+}

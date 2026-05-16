@@ -1,0 +1,54 @@
+<footer class="footer" data-section-id="{{ section.id }}">
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <a href="{{ routes.root_url }}" class="footer__logo">
+        {%- if settings.logo != blank -%}
+          <img src="{{ settings.logo | image_url: width: 180 }}" alt="{{ shop.name }}" width="120" height="auto">
+        {%- else -%}
+          <span class="footer__wordmark">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+      {%- if section.settings.tagline != blank -%}
+        <p class="footer__tagline">{{ section.settings.tagline }}</p>
+      {%- endif -%}
+    </div>
+
+    <nav class="footer__nav" aria-label="Footer">
+      {%- for link in linklists[section.settings.menu].links -%}
+        <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
+      {%- endfor -%}
+    </nav>
+
+    <div class="footer__social">
+      {%- if settings.social_instagram != blank -%}<a href="{{ settings.social_instagram }}" rel="noopener" aria-label="Instagram">IG</a>{%- endif -%}
+      {%- if settings.social_tiktok    != blank -%}<a href="{{ settings.social_tiktok }}"    rel="noopener" aria-label="TikTok">TT</a>{%- endif -%}
+      {%- if settings.social_twitter   != blank -%}<a href="{{ settings.social_twitter }}"   rel="noopener" aria-label="X">X</a>{%- endif -%}
+      {%- if settings.social_youtube   != blank -%}<a href="{{ settings.social_youtube }}"   rel="noopener" aria-label="YouTube">YT</a>{%- endif -%}
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <small>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</small>
+    <small class="footer__pack">— we are the pack —</small>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "default": "footer",
+      "label": "Menu"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Heavy armor for soft hearts."
+    }
+  ]
+}
+{% endschema %}

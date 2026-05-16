@@ -1,0 +1,7 @@
+[environments.development]
+store = "splootandco.myshopify.com"
+theme = "Sploot — Dev"
+
+[environments.production]
+store = "splootandco.myshopify.com"
+theme = "Sploot — Live"
