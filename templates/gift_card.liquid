@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>{{ 'gift_cards.issued.title' | t: shop: shop.name }}</title>
+    <link rel="canonical" href="{{ canonical_url }}">
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
+    {%- endif -%}
+
+    {{ content_for_header }}
+    {{ 'theme.css' | asset_url | stylesheet_tag }}
+
+    <style>
+      :root {
+        --color-bg: {{ settings.color_bg }};
+        --color-fg: {{ settings.color_fg }};
+        --color-accent: {{ settings.color_accent }};
+        --color-muted: {{ settings.color_muted }};
+        --color-line: {{ settings.color_line }};
+      }
+      body { display: grid; place-items: center; min-height: 100vh; padding: 32px; }
+      .gc {
+        max-width: 560px;
+        width: 100%;
+        text-align: center;
+        padding: 48px clamp(24px, 4vw, 56px);
+        border: 1px solid var(--color-line);
+        background: #060606;
+      }
+      .gc__wordmark {
+        font-family: var(--font-heading-family, "Archivo");
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 1.4rem;
+        letter-spacing: -.01em;
+        color: var(--color-fg);
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 24px;
+      }
+      .gc__eyebrow {
+        font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        font-size: .75rem;
+        color: var(--color-muted);
+        margin: 0 0 8px;
+      }
+      .gc__title {
+        font-family: var(--font-heading-family, "Archivo");
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 2.4rem;
+        line-height: 1;
+        margin: 0 0 32px;
+        color: var(--color-fg);
+      }
+      .gc__value {
+        font-family: var(--font-heading-family, "Archivo");
+        font-weight: 900;
+        font-size: 4rem;
+        line-height: 1;
+        color: var(--color-accent);
+        margin: 0 0 32px;
+      }
+      .gc__card {
+        background: var(--color-bg);
+        border: 1.5px solid var(--color-fg);
+        padding: 24px;
+        margin: 32px 0;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+        font-size: 1.4rem;
+        letter-spacing: .2em;
+        word-break: break-all;
+        color: var(--color-fg);
+      }
+      .gc__qr {
+        display: inline-block;
+        background: #fff;
+        padding: 16px;
+        margin: 24px 0;
+      }
+      .gc__qr img { display: block; width: 160px; height: 160px; }
+      .gc__expiry {
+        font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+        text-transform: uppercase;
+        letter-spacing: .15em;
+        font-size: .75rem;
+        color: var(--color-muted);
+        margin: 16px 0 0;
+      }
+      .gc__actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 32px;
+        flex-wrap: wrap;
+      }
+      @media print {
+        .gc__actions { display: none; }
+      }
+    </style>
+  </head>
+
+  <body class="template-gift_card">
+    <main class="gc">
+      <a href="{{ shop.url }}" class="gc__wordmark">{{ shop.name }}</a>
+
+      <p class="gc__eyebrow">Gift card</p>
+      <h1 class="gc__title">Heavy armor, lighter wallet</h1>
+
+      {%- if gift_card.enabled and gift_card.expired == false -%}
+        <p class="gc__value">{{ gift_card.initial_value | money }}</p>
+
+        <div class="gc__card">{{ gift_card.code | format_code }}</div>
+
+        <div class="gc__qr">{{ gift_card.qr_identifier | qr_code }}</div>
+
+        {%- if gift_card.expires_on -%}
+          <p class="gc__expiry">{{ 'gift_cards.issued.expired_on_date_html' | t: expiry_date: gift_card.expires_on | date: format: 'date' }}</p>
+        {%- endif -%}
+
+        <div class="gc__actions">
+          <a href="{{ shop.url }}" class="btn btn--outline">Shop the armory</a>
+          <button type="button" class="btn btn--solid" onclick="window.print()">Print</button>
+        </div>
+      {%- else -%}
+        <p class="gc__value">—</p>
+        <p>This gift card has been redeemed or has expired.</p>
+        <div class="gc__actions">
+          <a href="{{ shop.url }}" class="btn btn--solid">Shop the armory</a>
+        </div>
+      {%- endif -%}
+    </main>
+  </body>
+</html>

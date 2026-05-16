@@ -104,6 +104,23 @@
   </div>
 </section>
 
+<div class="sticky-atc" data-sticky-atc hidden>
+  <div class="sticky-atc__inner">
+    <div class="sticky-atc__detail">
+      {%- if featured -%}
+        <img src="{{ featured.preview_image | image_url: width: 100 }}" alt="" width="44" height="44">
+      {%- endif -%}
+      <div>
+        <p class="sticky-atc__title">{{ product.title }}</p>
+        <p class="sticky-atc__price" data-sticky-price>{{ current_variant.price | money }}</p>
+      </div>
+    </div>
+    <button type="button" class="btn btn--solid sticky-atc__btn" data-sticky-add>
+      {{ 'products.product.add_to_cart' | t }}
+    </button>
+  </div>
+</div>
+
 <script type="application/json" data-product-json>
   {{ product | json }}
 </script>

@@ -8,47 +8,135 @@
       {%- endif -%}
     </header>
 
-    <div class="collection__toolbar">
-      <span class="collection__count">{{ collection.products_count }} items</span>
-      <form class="collection__sort" method="get">
-        <label for="SortBy" class="visually-hidden">{{ 'products.facets.sort_by' | t }}</label>
-        <select id="SortBy" name="sort_by" onchange="this.form.submit()">
-          {%- assign sort = collection.sort_by | default: collection.default_sort_by -%}
-          {%- for option in collection.sort_options -%}
-            <option value="{{ option.value }}" {% if option.value == sort %}selected{% endif %}>{{ option.name }}</option>
-          {%- endfor -%}
-        </select>
-      </form>
-    </div>
-
     {%- paginate collection.products by 24 -%}
-      {%- if collection.products.size > 0 -%}
-        <div class="product-grid product-grid--cols-{{ section.settings.cols }}">
-          {%- for product in collection.products -%}
-            {% render 'product-card', product: product %}
-          {%- endfor -%}
-        </div>
+      <div class="collection__layout{% if section.settings.show_filters %} collection__layout--with-filters{% endif %}">
 
-        {%- if paginate.pages > 1 -%}
-          <nav class="pagination" aria-label="Pagination">
-            {%- if paginate.previous -%}
-              <a href="{{ paginate.previous.url }}">{{ 'general.pagination.previous' | t }}</a>
-            {%- endif -%}
-            {%- for part in paginate.parts -%}
-              {%- if part.is_link -%}
-                <a href="{{ part.url }}">{{ part.title }}</a>
-              {%- else -%}
-                <span{% if part.title == paginate.current_page %} class="is-current"{% endif %}>{{ part.title }}</span>
-              {%- endif -%}
-            {%- endfor -%}
-            {%- if paginate.next -%}
-              <a href="{{ paginate.next.url }}">{{ 'general.pagination.next' | t }}</a>
-            {%- endif -%}
-          </nav>
+        {%- if section.settings.show_filters -%}
+          <aside class="filters" id="CollectionFilters">
+            <button type="button" class="filters__toggle" data-filters-toggle aria-expanded="false" aria-controls="FiltersPanel">
+              {{ 'products.facets.filter_by' | t }}
+              <span class="filters__count" data-filter-count></span>
+            </button>
+
+            <form id="FiltersPanel" class="filters__panel" data-filters-form>
+              <header class="filters__head">
+                <span>{{ 'products.facets.filter_by' | t }}</span>
+                <button type="button" class="filters__close" data-filters-close aria-label="{{ 'accessibility.close' | t }}">×</button>
+              </header>
+
+              {%- for filter in collection.filters -%}
+                {%- case filter.type -%}
+                  {%- when 'list' -%}
+                    <details class="filters__group" open>
+                      <summary>
+                        <span>{{ filter.label }}</span>
+                        <span class="filters__plus" aria-hidden="true">+</span>
+                      </summary>
+                      <ul class="filters__values">
+                        {%- for value in filter.values -%}
+                          <li>
+                            <label class="filters__value {% if value.count == 0 and value.active == false %}is-disabled{% endif %}">
+                              <input
+                                type="checkbox"
+                                name="{{ value.param_name }}"
+                                value="{{ value.value }}"
+                                {% if value.active %}checked{% endif %}
+                                {% if value.count == 0 and value.active == false %}disabled{% endif %}>
+                              <span>{{ value.label }}</span>
+                              <small>({{ value.count }})</small>
+                            </label>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </details>
+                  {%- when 'price_range' -%}
+                    <details class="filters__group" open>
+                      <summary>
+                        <span>{{ filter.label }}</span>
+                        <span class="filters__plus" aria-hidden="true">+</span>
+                      </summary>
+                      <div class="filters__price">
+                        <label>
+                          <span>From</span>
+                          <input type="number"
+                            name="{{ filter.min_value.param_name }}"
+                            value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"
+                            min="0"
+                            placeholder="0">
+                        </label>
+                        <label>
+                          <span>To</span>
+                          <input type="number"
+                            name="{{ filter.max_value.param_name }}"
+                            value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+                            min="0"
+                            placeholder="{{ filter.range_max | money_without_currency }}">
+                        </label>
+                      </div>
+                    </details>
+                {%- endcase -%}
+              {%- endfor -%}
+
+              <footer class="filters__foot">
+                <a href="{{ collection.url }}" class="filters__clear">{{ 'products.facets.clear_all' | t }}</a>
+                <button type="submit" class="btn btn--solid">Apply</button>
+              </footer>
+            </form>
+          </aside>
         {%- endif -%}
-      {%- else -%}
-        <p class="empty">{{ 'collections.general.no_matches' | t }}</p>
-      {%- endif -%}
+
+        <div class="collection__main">
+          <div class="collection__toolbar">
+            <span class="collection__count">{{ collection.products_count }} items</span>
+            <form class="collection__sort" method="get">
+              {%- for filter in collection.filters -%}
+                {%- if filter.type == 'list' -%}
+                  {%- for value in filter.values -%}
+                    {%- if value.active -%}
+                      <input type="hidden" name="{{ value.param_name }}" value="{{ value.value }}">
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endif -%}
+              {%- endfor -%}
+              <label for="SortBy" class="visually-hidden">{{ 'products.facets.sort_by' | t }}</label>
+              <select id="SortBy" name="sort_by" onchange="this.form.submit()">
+                {%- assign sort = collection.sort_by | default: collection.default_sort_by -%}
+                {%- for option in collection.sort_options -%}
+                  <option value="{{ option.value }}" {% if option.value == sort %}selected{% endif %}>{{ option.name }}</option>
+                {%- endfor -%}
+              </select>
+            </form>
+          </div>
+
+          {%- if collection.products.size > 0 -%}
+            <div class="product-grid product-grid--cols-{{ section.settings.cols }}">
+              {%- for product in collection.products -%}
+                {% render 'product-card', product: product %}
+              {%- endfor -%}
+            </div>
+
+            {%- if paginate.pages > 1 -%}
+              <nav class="pagination" aria-label="Pagination">
+                {%- if paginate.previous -%}
+                  <a href="{{ paginate.previous.url }}">{{ 'general.pagination.previous' | t }}</a>
+                {%- endif -%}
+                {%- for part in paginate.parts -%}
+                  {%- if part.is_link -%}
+                    <a href="{{ part.url }}">{{ part.title }}</a>
+                  {%- else -%}
+                    <span{% if part.title == paginate.current_page %} class="is-current"{% endif %}>{{ part.title }}</span>
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if paginate.next -%}
+                  <a href="{{ paginate.next.url }}">{{ 'general.pagination.next' | t }}</a>
+                {%- endif -%}
+              </nav>
+            {%- endif -%}
+          {%- else -%}
+            <p class="empty">{{ 'collections.general.no_matches' | t }}</p>
+          {%- endif -%}
+        </div>
+      </div>
     {%- endpaginate -%}
   </div>
 </section>
@@ -57,6 +145,13 @@
 {
   "name": "Collection",
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show filters sidebar",
+      "default": true,
+      "info": "Filters configured in Admin > Online Store > Navigation > Collection filtering."
+    },
     {
       "type": "select",
       "id": "cols",

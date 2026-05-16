@@ -1,0 +1,25 @@
+<cookies-banner id="CookiesBanner" hidden>
+  <div class="cookies__inner">
+    <p class="cookies__text">{{ section.settings.text }}</p>
+    <div class="cookies__actions">
+      <button type="button" class="btn btn--outline cookies__decline" data-cookies-decline>{{ section.settings.decline_label | default: 'Decline' }}</button>
+      <button type="button" class="btn btn--solid  cookies__accept"  data-cookies-accept>{{ section.settings.accept_label  | default: 'Accept' }}</button>
+    </div>
+  </div>
+</cookies-banner>
+
+{% schema %}
+{
+  "name": "Cookies banner",
+  "settings": [
+    { "type": "text", "id": "text",
+      "label": "Banner text",
+      "default": "We use cookies for cart and basic analytics. No selling your soul." },
+    { "type": "text", "id": "accept_label",  "label": "Accept button label",  "default": "Accept" },
+    { "type": "text", "id": "decline_label", "label": "Decline button label", "default": "Decline" }
+  ],
+  "presets": [
+    { "name": "Cookies banner" }
+  ]
+}
+{% endschema %}

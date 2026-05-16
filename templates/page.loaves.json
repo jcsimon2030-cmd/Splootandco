@@ -1,0 +1,62 @@
+{
+  "sections": {
+    "hero": {
+      "type": "loaves-hero",
+      "settings": {
+        "tagline": "Heaven sent. Hell on your personal space. The official society for soft hearts in heavy armor.",
+        "ticker_text": "WE ARE THE PACK"
+      }
+    },
+    "credo": {
+      "type": "loaves-credo",
+      "settings": { "eyebrow": "The four laws of the pack" },
+      "blocks": {
+        "l1": { "type": "law", "settings": { "title": "Stay soft",
+          "body": "Tenderness is a weapon. Refuse to apologize for it." } },
+        "l2": { "type": "law", "settings": { "title": "Stay feral",
+          "body": "The internet wants a lone wolf. We are the pack." } },
+        "l3": { "type": "law", "settings": { "title": "Wear the armor",
+          "body": "Heavyweight cotton. Distressed graphics. Built to outlive your worst week." } },
+        "l4": { "type": "law", "settings": { "title": "Take the nap",
+          "body": "Rest is rebellion. Lie down often. Dream meaner." } }
+      },
+      "block_order": ["l1", "l2", "l3", "l4"]
+    },
+    "lookbook": {
+      "type": "lookbook",
+      "settings": {
+        "eyebrow": "Field notes",
+        "heading": "In the wild",
+        "body": "<p>The pack, photographed in their natural habitat: soft hearts, hard mornings, longer walks than expected.</p>",
+        "cta_label": "Shop the lookbook",
+        "cta_link": "shopify://collections/heavy-armor"
+      },
+      "blocks": {
+        "lb1": { "type": "tile", "settings": { "size": "lg",   "overlay": "I",   "caption": "Heavy Armor — Drop 01" } },
+        "lb2": { "type": "tile", "settings": { "size": "sm",   "overlay": "II",  "caption": "The Crest" } },
+        "lb3": { "type": "tile", "settings": { "size": "sm",   "overlay": "III", "caption": "Brutalist crest, soft heart" } },
+        "lb4": { "type": "tile", "settings": { "size": "wide", "overlay": "IV",  "caption": "We are the pack" } }
+      },
+      "block_order": ["lb1", "lb2", "lb3", "lb4"]
+    },
+    "featured": {
+      "type": "featured-collection",
+      "settings": {
+        "eyebrow": "Member uniform",
+        "heading": "The official kit",
+        "collection": "heavy-armor",
+        "limit": 4,
+        "cols": "4"
+      }
+    },
+    "join": {
+      "type": "manifesto",
+      "settings": {
+        "eyebrow": "Card-carrying members",
+        "body": "<p>Membership is free. Initiation is automatic. <em>The first time you put it on, you're in.</em></p>",
+        "signature": "Loaves Napping Club"
+      }
+    }
+  },
+  "order": ["hero", "credo", "lookbook", "featured", "join"]
+}

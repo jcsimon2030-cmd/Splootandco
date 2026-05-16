@@ -1,0 +1,51 @@
+<section class="credo" data-section-id="{{ section.id }}">
+  <div class="container">
+    <p class="credo__eyebrow">{{ section.settings.eyebrow }}</p>
+    <ol class="credo__list">
+      {%- for block in section.blocks -%}
+        <li class="credo__item" {{ block.shopify_attributes }}>
+          <span class="credo__num">{{ forloop.index | prepend: '00' | slice: -2, 2 }}</span>
+          <h3 class="credo__heading">{{ block.settings.title }}</h3>
+          <p class="credo__body">{{ block.settings.body }}</p>
+        </li>
+      {%- endfor -%}
+    </ol>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Loaves credo",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The four laws of the pack" }
+  ],
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "law",
+      "name": "Law",
+      "settings": [
+        { "type": "text",     "id": "title", "label": "Title", "default": "Stay soft" },
+        { "type": "textarea", "id": "body",
+          "label": "Body",
+          "default": "Tenderness is a weapon. Refuse to apologize for it." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Loaves credo",
+      "blocks": [
+        { "type": "law", "settings": { "title": "Stay soft",
+            "body": "Tenderness is a weapon. Refuse to apologize for it." } },
+        { "type": "law", "settings": { "title": "Stay feral",
+            "body": "The internet wants a lone wolf. We are the pack." } },
+        { "type": "law", "settings": { "title": "Wear the armor",
+            "body": "Heavyweight cotton. Distressed graphics. Built to outlive your worst week." } },
+        { "type": "law", "settings": { "title": "Take the nap",
+            "body": "Rest is rebellion. Lie down often. Dream meaner." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

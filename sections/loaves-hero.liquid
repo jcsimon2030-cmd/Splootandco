@@ -1,0 +1,52 @@
+<section
+  class="loaves-hero{% if section.settings.bg_image %} loaves-hero--has-bg{% endif %}"
+  data-section-id="{{ section.id }}"
+  {% if section.settings.bg_image %}style="background-image:url('{{ section.settings.bg_image | image_url: width: 2400 }}');"{% endif %}>
+
+  <div class="loaves-hero__scrim"></div>
+
+  <div class="container loaves-hero__inner">
+    <p class="loaves-hero__crest">✦ EST. 2025 ✦</p>
+
+    <h1 class="loaves-hero__title">
+      <span>Loaves</span>
+      <span class="loaves-hero__title-accent">Napping</span>
+      <span>Club</span>
+    </h1>
+
+    <p class="loaves-hero__sub">{{ section.settings.tagline }}</p>
+
+    <div class="loaves-hero__meta">
+      <span>Member 001 · You</span>
+      <span>·</span>
+      <span>Pack strength: rising</span>
+    </div>
+  </div>
+
+  <div class="loaves-hero__ticker" aria-hidden="true">
+    <div class="loaves-hero__track">
+      {%- for i in (1..6) -%}
+        <span>{{ section.settings.ticker_text }}</span>
+        <span class="loaves-hero__bullet">✦</span>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Loaves hero",
+  "settings": [
+    { "type": "image_picker", "id": "bg_image", "label": "Background image" },
+    { "type": "text",         "id": "tagline",
+      "label": "Tagline",
+      "default": "Heaven sent. Hell on your personal space. The official society for soft hearts in heavy armor." },
+    { "type": "text",         "id": "ticker_text",
+      "label": "Ticker text",
+      "default": "WE ARE THE PACK" }
+  ],
+  "presets": [
+    { "name": "Loaves hero" }
+  ]
+}
+{% endschema %}

@@ -15,7 +15,13 @@
         "menu": "footer",
         "tagline": "Heavy armor for soft hearts."
       }
+    },
+    "cookies": {
+      "type": "cookies-banner",
+      "settings": {
+        "text": "We use cookies for cart and basic analytics. No selling your soul."
+      }
     }
   },
-  "order": ["newsletter", "footer"]
+  "order": ["newsletter", "footer", "cookies"]
 }
