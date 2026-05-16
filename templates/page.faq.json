@@ -1,0 +1,44 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-faq",
+      "settings": {
+        "eyebrow": "Help",
+        "heading": "FAQ",
+        "intro": "<p>Quick answers. If your question isn't here, hit us up — the pack answers.</p>"
+      },
+      "blocks": {
+        "g1": { "type": "group", "settings": { "title": "Orders & shipping" } },
+        "q1": { "type": "qa", "settings": {
+          "question": "When will my order ship?",
+          "answer": "<p>Orders ship in 5–10 business days from our print partner. Tracking arrives by email.</p>"
+        }},
+        "q2": { "type": "qa", "settings": {
+          "question": "Do you ship internationally?",
+          "answer": "<p>Yes — most countries. Duties and taxes are calculated at checkout.</p>"
+        }},
+        "g2": { "type": "group", "settings": { "title": "Sizing & fit" } },
+        "q3": { "type": "qa", "settings": {
+          "question": "How do your tees fit?",
+          "answer": "<p>Boxy and loose. If you're between sizes, go down for a fitted look or up for oversized.</p>"
+        }},
+        "q4": { "type": "qa", "settings": {
+          "question": "How do the hoodies fit?",
+          "answer": "<p>Oversized drop-shoulder. Most folks wear their normal size; size down if you want something less roomy.</p>"
+        }},
+        "g3": { "type": "group", "settings": { "title": "Care" } },
+        "q5": { "type": "qa", "settings": {
+          "question": "How should I wash my Sploot piece?",
+          "answer": "<p>Inside out, cold wash, hang dry. Treat the graphic gently and it'll outlive your relationships.</p>"
+        }},
+        "g4": { "type": "group", "settings": { "title": "Returns" } },
+        "q6": { "type": "qa", "settings": {
+          "question": "What's your return policy?",
+          "answer": "<p>Unworn items in original condition within 30 days. Print-on-demand items are final sale unless damaged.</p>"
+        }}
+      },
+      "block_order": ["g1", "q1", "q2", "g2", "q3", "q4", "g3", "q5", "g4", "q6"]
+    }
+  },
+  "order": ["main"]
+}

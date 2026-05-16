@@ -1,0 +1,98 @@
+<section class="faq" data-section-id="{{ section.id }}">
+  <div class="container container--narrow">
+    <header class="faq__head">
+      <p class="faq__eyebrow">{{ section.settings.eyebrow }}</p>
+      <h1 class="faq__title">{{ section.settings.heading | default: page.title }}</h1>
+      {%- if section.settings.intro != blank -%}
+        <div class="faq__intro rte">{{ section.settings.intro }}</div>
+      {%- endif -%}
+    </header>
+
+    {%- assign current_group = '' -%}
+    <div class="faq__list">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'group' -%}
+          {%- assign current_group = block.settings.title -%}
+          <h2 class="faq__group">{{ block.settings.title }}</h2>
+        {%- elsif block.type == 'qa' -%}
+          <details class="faq__item" {{ block.shopify_attributes }}>
+            <summary>
+              <span>{{ block.settings.question }}</span>
+              <span class="faq__plus" aria-hidden="true">+</span>
+            </summary>
+            <div class="faq__answer rte">{{ block.settings.answer }}</div>
+          </details>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if page.content != blank -%}
+      <div class="faq__page-body rte">{{ page.content }}</div>
+    {%- endif -%}
+
+    {%- if section.settings.contact_text != blank -%}
+      <aside class="faq__contact">
+        <p>{{ section.settings.contact_text }}</p>
+        {%- if section.settings.contact_link != blank -%}
+          <a href="{{ section.settings.contact_link }}" class="btn btn--outline">{{ section.settings.contact_cta | default: 'Get in touch' }}</a>
+        {%- endif -%}
+      </aside>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "settings": [
+    { "type": "text",     "id": "eyebrow", "label": "Eyebrow", "default": "Help" },
+    { "type": "text",     "id": "heading", "label": "Heading", "default": "" },
+    { "type": "richtext", "id": "intro",   "label": "Intro copy" },
+    { "type": "header",   "content": "Help footer" },
+    { "type": "text",     "id": "contact_text", "label": "Contact prompt", "default": "Still got questions?" },
+    { "type": "text",     "id": "contact_cta",  "label": "Button label",   "default": "Email the pack" },
+    { "type": "url",      "id": "contact_link", "label": "Button link" }
+  ],
+  "blocks": [
+    {
+      "type": "group",
+      "name": "Group heading",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Group title", "default": "Orders" }
+      ]
+    },
+    {
+      "type": "qa",
+      "name": "Question",
+      "settings": [
+        { "type": "text",     "id": "question", "label": "Question", "default": "When will my order ship?" },
+        { "type": "richtext", "id": "answer",   "label": "Answer",
+          "default": "<p>Orders ship within 5–10 business days from our print partner. You'll get tracking the moment it leaves the dock.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ",
+      "blocks": [
+        { "type": "group", "settings": { "title": "Orders & shipping" } },
+        { "type": "qa",    "settings": { "question": "When will my order ship?",
+            "answer": "<p>Orders ship in 5–10 business days from our print partner. Tracking arrives by email.</p>" } },
+        { "type": "qa",    "settings": { "question": "Do you ship internationally?",
+            "answer": "<p>Yes — most countries. Duties and taxes are calculated at checkout.</p>" } },
+        { "type": "group", "settings": { "title": "Sizing & fit" } },
+        { "type": "qa",    "settings": { "question": "How do your tees fit?",
+            "answer": "<p>Boxy and loose. If you're between sizes, go down for a fitted look or up for oversized.</p>" } },
+        { "type": "qa",    "settings": { "question": "How do the hoodies fit?",
+            "answer": "<p>Oversized drop-shoulder. Most folks wear their normal size; size down if you want something less roomy.</p>" } },
+        { "type": "group", "settings": { "title": "Care" } },
+        { "type": "qa",    "settings": { "question": "How should I wash my Sploot piece?",
+            "answer": "<p>Inside out, cold wash, hang dry. Treat the graphic gently and it'll outlive your relationships.</p>" } },
+        { "type": "group", "settings": { "title": "Returns" } },
+        { "type": "qa",    "settings": { "question": "What's your return policy?",
+            "answer": "<p>Unworn items in original condition within 30 days. Print-on-demand items are final sale unless damaged.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

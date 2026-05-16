@@ -2,35 +2,48 @@
   assign card_style = settings.card_style
   assign img = product.featured_media.preview_image
 -%}
-<a href="{{ product.url }}" class="product-card product-card--{{ card_style }}" data-product-handle="{{ product.handle }}">
+<article class="product-card product-card--{{ card_style }}" data-product-handle="{{ product.handle }}">
   <div class="product-card__media">
-    {%- if img -%}
-      <img
-        src="{{ img | image_url: width: 800 }}"
-        srcset="{{ img | image_url: width: 400 }} 400w,
-                {{ img | image_url: width: 600 }} 600w,
-                {{ img | image_url: width: 800 }} 800w,
-                {{ img | image_url: width: 1200 }} 1200w"
-        sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
-        alt="{{ img.alt | escape | default: product.title }}"
-        width="{{ img.width }}"
-        height="{{ img.height }}"
-        loading="lazy">
-    {%- else -%}
-      <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
-    {%- endif -%}
+    <a href="{{ product.url }}" class="product-card__link" aria-label="{{ product.title | escape }}">
+      {%- if img -%}
+        <img
+          src="{{ img | image_url: width: 800 }}"
+          srcset="{{ img | image_url: width: 400 }} 400w,
+                  {{ img | image_url: width: 600 }} 600w,
+                  {{ img | image_url: width: 800 }} 800w,
+                  {{ img | image_url: width: 1200 }} 1200w"
+          sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
+          alt="{{ img.alt | escape | default: product.title }}"
+          width="{{ img.width }}"
+          height="{{ img.height }}"
+          loading="lazy">
+      {%- else -%}
+        <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+      {%- endif -%}
+    </a>
 
     {%- if product.compare_at_price > product.price -%}
       <span class="product-card__tag">Sale</span>
     {%- elsif product.available == false -%}
       <span class="product-card__tag product-card__tag--out">Sold out</span>
     {%- endif -%}
+
+    <button
+      type="button"
+      class="product-card__quick-view"
+      data-quick-view
+      data-product-handle="{{ product.handle }}"
+      aria-label="Quick view {{ product.title | escape }}">
+      Quick view
+    </button>
   </div>
 
   <div class="product-card__info">
-    <h3 class="product-card__title">{{ product.title }}</h3>
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
     <div class="product-card__price">
       {%- render 'price', product: product, show_from: true -%}
     </div>
   </div>
-</a>
+</article>

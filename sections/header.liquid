@@ -26,15 +26,31 @@
     </nav>
 
     <div class="header__actions">
-      <a href="{{ routes.search_url }}" class="header__action" aria-label="{{ 'accessibility.search' | t }}">
+      <button type="button" class="header__action" data-search-toggle aria-label="{{ 'accessibility.search' | t }}" aria-expanded="false" aria-controls="PredictiveSearch">
         {% render 'icon-search' %}
-      </a>
+      </button>
       <a href="{{ routes.cart_url }}" class="header__action header__cart" data-cart-toggle aria-label="{{ 'accessibility.cart' | t }}">
         {% render 'icon-cart' %}
         <span class="header__cart-count" data-cart-count>{{ cart.item_count }}</span>
       </a>
     </div>
   </div>
+
+  <predictive-search id="PredictiveSearch" hidden>
+    <form action="{{ routes.search_url }}" method="get" class="predictive-search__form" role="search">
+      <input
+        type="search"
+        name="q"
+        autocomplete="off"
+        placeholder="{{ 'general.search.placeholder' | t }}"
+        aria-label="{{ 'accessibility.search' | t }}"
+        data-predictive-input>
+      <button type="button" class="predictive-search__close" data-search-close aria-label="{{ 'accessibility.close' | t }}">
+        {% render 'icon-close' %}
+      </button>
+    </form>
+    <div class="predictive-search__results" data-predictive-results hidden></div>
+  </predictive-search>
 
   <div class="header__mobile-nav" id="MobileNav" hidden>
     <nav aria-label="Mobile">

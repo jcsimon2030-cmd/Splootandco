@@ -44,6 +44,23 @@
         "signature": "Sploot & Co"
       }
     },
+    "lookbook": {
+      "type": "lookbook",
+      "settings": {
+        "eyebrow": "Editorial",
+        "heading": "Loaves Napping Club",
+        "body": "<p>Field notes from the pack. Garments photographed in their natural habitat: soft hearts, hard mornings, longer walks than expected.</p>",
+        "cta_label": "Shop the lookbook",
+        "cta_link": "shopify://collections/heavy-armor"
+      },
+      "blocks": {
+        "lb1": { "type": "tile", "settings": { "size": "lg",   "overlay": "I",   "caption": "Heavy Armor — Drop 01" } },
+        "lb2": { "type": "tile", "settings": { "size": "sm",   "overlay": "II",  "caption": "The Crest" } },
+        "lb3": { "type": "tile", "settings": { "size": "sm",   "overlay": "III", "caption": "Brutalist crest, soft heart" } },
+        "lb4": { "type": "tile", "settings": { "size": "wide", "overlay": "IV",  "caption": "We are the pack" } }
+      },
+      "block_order": ["lb1", "lb2", "lb3", "lb4"]
+    },
     "image_with_text": {
       "type": "image-with-text",
       "settings": {
@@ -61,6 +78,7 @@
     "featured_drop",
     "collections",
     "manifesto",
+    "lookbook",
     "image_with_text"
   ]
 }
