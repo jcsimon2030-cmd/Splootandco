@@ -39,7 +39,20 @@
       { "type": "color", "id": "color_fg", "label": "Foreground / text", "default": "#F4EFE6" },
       { "type": "color", "id": "color_accent", "label": "Accent (buttons, hover)", "default": "#B5471A" },
       { "type": "color", "id": "color_muted", "label": "Muted text", "default": "#8C8275" },
-      { "type": "color", "id": "color_line", "label": "Lines / borders", "default": "#2A2A2A" }
+      { "type": "color", "id": "color_line", "label": "Lines / borders", "default": "#2A2A2A" },
+      {
+        "type": "color_scheme_group",
+        "id": "color_schemes",
+        "definition": [
+          { "type": "color", "id": "background", "label": "Background", "default": "#0B0B0B" },
+          { "type": "color", "id": "text", "label": "Text", "default": "#F4EFE6" },
+          { "type": "color", "id": "accent", "label": "Accent", "default": "#B5471A" }
+        ],
+        "role": {
+          "background": "background",
+          "text": "text"
+        }
+      }
     ]
   },
   {

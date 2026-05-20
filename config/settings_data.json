@@ -10,7 +10,16 @@
     "type_heading_font": "archivo_n9",
     "headings_uppercase": true,
     "container_width": 1440,
-    "card_style": "edge"
+    "card_style": "edge",
+    "color_schemes": {
+      "scheme-1": {
+        "settings": {
+          "background": "#0B0B0B",
+          "text": "#F4EFE6",
+          "accent": "#B5471A"
+        }
+      }
+    }
   },
   "presets": {
     "Sploot — Default": {

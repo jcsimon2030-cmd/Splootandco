@@ -35,12 +35,12 @@
       assign body_font = settings.type_body_font
       assign heading_font = settings.type_heading_font
     -%}
-    {{ body_font | font_face: font_display: 'swap' }}
-    {{ heading_font | font_face: font_display: 'swap' }}
-    {{ body_font | font_modifier: 'italic' | font_face: font_display: 'swap' }}
-    {{ body_font | font_modifier: 'bold' | font_face: font_display: 'swap' }}
-
     <style>
+      {{ body_font | font_face: font_display: 'swap' }}
+      {{ heading_font | font_face: font_display: 'swap' }}
+      {{ body_font | font_modifier: 'italic' | font_face: font_display: 'swap' }}
+      {{ body_font | font_modifier: 'bold' | font_face: font_display: 'swap' }}
+
       :root {
         --color-bg: {{ settings.color_bg }};
         --color-fg: {{ settings.color_fg }};
