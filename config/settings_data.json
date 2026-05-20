@@ -16,7 +16,10 @@
         "settings": {
           "background": "#0B0B0B",
           "text": "#F4EFE6",
-          "accent": "#B5471A"
+          "button": "#F4EFE6",
+          "button_label": "#0B0B0B",
+          "secondary_button_label": "#F4EFE6",
+          "shadow": "#000000"
         }
       }
     }
