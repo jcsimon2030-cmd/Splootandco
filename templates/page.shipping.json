@@ -1,0 +1,59 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-shipping",
+      "settings": {
+        "eyebrow": "Logistics",
+        "heading": "Shipping & delivery",
+        "intro": "<p>Every Sploot piece is printed to order, then sent on its way with a tracked carrier. Here's exactly what to expect — production, transit, and what happens if anything goes sideways.</p>",
+        "show_voyage": true,
+        "step1_title": "Made to order",
+        "step1_body": "Each piece is printed for you after you order. 98% of orders are produced within 48 hours.",
+        "step2_title": "On the way",
+        "step2_body": "Your order ships with a tracked carrier. A tracking number is emailed and synced to your account.",
+        "step3_title": "Delivered",
+        "step3_body": "It lands. Delivery is confirmed once the carrier marks the package Delivered.",
+        "table_heading": "Estimated delivery",
+        "table_note": "Windows are carrier transit time in business days, added on top of ~2 days production. Remote areas may run longer.",
+        "carriers": "UPS · FedEx · USPS · CNE · YunExpress",
+        "policy_heading": "Good to know"
+      },
+      "blocks": {
+        "r-us": { "type": "region", "settings": { "region": "United States",  "standard_time": "7–12 business days", "express_time": "3–5 business days" } },
+        "r-uk": { "type": "region", "settings": { "region": "United Kingdom", "standard_time": "6–10 business days", "express_time": "3–5 business days" } },
+        "r-de": { "type": "region", "settings": { "region": "Germany",        "standard_time": "6–10 business days", "express_time": "4–7 business days" } },
+        "r-fr": { "type": "region", "settings": { "region": "France",         "standard_time": "6–10 business days", "express_time": "4–7 business days" } },
+        "r-it": { "type": "region", "settings": { "region": "Italy",          "standard_time": "6–10 business days", "express_time": "4–7 business days" } },
+        "r-ca": { "type": "region", "settings": { "region": "Canada",         "standard_time": "7–12 business days", "express_time": "5–7 business days" } },
+        "r-au": { "type": "region", "settings": { "region": "Australia",      "standard_time": "7–12 business days", "express_time": "—" } },
+        "r-row": { "type": "region", "settings": { "region": "Rest of world", "standard_time": "10–30 business days", "express_time": "—" } },
+        "p-pod": { "type": "policy", "settings": {
+          "question": "Everything is made to order",
+          "answer": "<p>We don't hold stock — each garment is printed when you order it. That keeps the catalog wide and waste low, but it means the clock starts at production (~2 business days), then carrier transit on top.</p>"
+        }},
+        "p-track": { "type": "policy", "settings": {
+          "question": "How do I track my order?",
+          "answer": "<p>A tracking number is emailed to you and synced to your account the moment your order ships. You can follow it in real time at <a href=\"https://www.17track.net/en\" rel=\"noopener\">17track.net</a>.</p>"
+        }},
+        "p-addr": { "type": "policy", "settings": {
+          "question": "I entered the wrong address",
+          "answer": "<p>Email us right away. If the order hasn't gone into production we can update it. Once it ships to a wrong or incomplete address, any storage, handling, and redelivery costs are the customer's responsibility.</p>"
+        }},
+        "p-delay": { "type": "policy", "settings": {
+          "question": "My order is running late",
+          "answer": "<p>Every order is backed by a Delay Compensation Guarantee. If a package runs significantly past its estimate, contact us — depending on the case we'll make it right with compensation, a reshipment, or a full refund.</p>"
+        }},
+        "p-damage": { "type": "policy", "settings": {
+          "question": "My item arrived damaged or wrong",
+          "answer": "<p>That's on us. Email <a href=\"mailto:jcsimon2030@gmail.com\">jcsimon2030@gmail.com</a> within 14 days of delivery with photos of the item and packaging and we'll replace it or refund you.</p>"
+        }},
+        "p-duties": { "type": "policy", "settings": {
+          "question": "Customs, duties & import taxes",
+          "answer": "<p>International orders may incur duties or import taxes set by the destination country. These are the customer's responsibility and are not included in the order total.</p>"
+        }}
+      },
+      "block_order": ["r-us","r-uk","r-de","r-fr","r-it","r-ca","r-au","r-row","p-pod","p-track","p-addr","p-delay","p-damage","p-duties"]
+    }
+  },
+  "order": ["main"]
+}

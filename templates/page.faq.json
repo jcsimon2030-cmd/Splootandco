@@ -5,39 +5,58 @@
       "settings": {
         "eyebrow": "Help",
         "heading": "FAQ",
-        "intro": "<p>Quick answers. If your question isn't here, hit us up — the pack answers.</p>"
+        "intro": "<p>Quick answers. If your question isn't here, hit us up — the pack answers.</p>",
+        "contact_text": "Still got questions?",
+        "contact_cta": "Email the pack",
+        "contact_link": "mailto:jcsimon2030@gmail.com"
       },
       "blocks": {
         "g1": { "type": "group", "settings": { "title": "Orders & shipping" } },
         "q1": { "type": "qa", "settings": {
-          "question": "When will my order ship?",
-          "answer": "<p>Orders ship in 5–10 business days from our print partner. Tracking arrives by email.</p>"
+          "question": "When will my order arrive?",
+          "answer": "<p>Every Sploot piece is printed to order. Production takes about 2 business days (98% of orders ship within 48 hours), then carrier transit: 7–12 business days within the US, 6–12 across the UK and EU, and up to 30 for the rest of the world. See the <a href=\"/pages/shipping\">shipping page</a> for a full breakdown.</p>"
         }},
         "q2": { "type": "qa", "settings": {
           "question": "Do you ship internationally?",
-          "answer": "<p>Yes — most countries. Duties and taxes are calculated at checkout.</p>"
+          "answer": "<p>Yes — the US, UK, Germany, France, Italy, Canada, Australia and most other countries. Shipping options and costs are shown at checkout. Any customs duties or import taxes are the customer's responsibility.</p>"
+        }},
+        "q3": { "type": "qa", "settings": {
+          "question": "How do I track my order?",
+          "answer": "<p>A tracking number is emailed to you and synced to your account as soon as your order ships. You can follow it in real time at <a href=\"https://www.17track.net/en\" rel=\"noopener\">17track.net</a>.</p>"
+        }},
+        "q4": { "type": "qa", "settings": {
+          "question": "I entered the wrong address — can you fix it?",
+          "answer": "<p>Email us right away. If your order hasn't entered production we can update it. Once it ships to a wrong or incomplete address, any storage and redelivery costs fall to the customer.</p>"
+        }},
+        "q5": { "type": "qa", "settings": {
+          "question": "My order is really late",
+          "answer": "<p>Every order is backed by a Delay Compensation Guarantee. If a package runs significantly past its estimate, reach out — depending on the case we'll compensate, reship, or fully refund.</p>"
         }},
         "g2": { "type": "group", "settings": { "title": "Sizing & fit" } },
-        "q3": { "type": "qa", "settings": {
+        "q6": { "type": "qa", "settings": {
           "question": "How do your tees fit?",
           "answer": "<p>Boxy and loose. If you're between sizes, go down for a fitted look or up for oversized.</p>"
         }},
-        "q4": { "type": "qa", "settings": {
+        "q7": { "type": "qa", "settings": {
           "question": "How do the hoodies fit?",
           "answer": "<p>Oversized drop-shoulder. Most folks wear their normal size; size down if you want something less roomy.</p>"
         }},
         "g3": { "type": "group", "settings": { "title": "Care" } },
-        "q5": { "type": "qa", "settings": {
+        "q8": { "type": "qa", "settings": {
           "question": "How should I wash my Sploot piece?",
           "answer": "<p>Inside out, cold wash, hang dry. Treat the graphic gently and it'll outlive your relationships.</p>"
         }},
         "g4": { "type": "group", "settings": { "title": "Returns" } },
-        "q6": { "type": "qa", "settings": {
+        "q9": { "type": "qa", "settings": {
           "question": "What's your return policy?",
-          "answer": "<p>Unworn items in original condition within 30 days. Print-on-demand items are final sale unless damaged.</p>"
+          "answer": "<p>Because every piece is printed to order, we can't take returns or exchanges for change of mind or sizing — please check the fit notes before ordering.</p>"
+        }},
+        "q10": { "type": "qa", "settings": {
+          "question": "My item arrived damaged or wrong",
+          "answer": "<p>That's on us. Email us within 14 days of delivery with photos of the item and packaging and we'll replace it or refund you.</p>"
         }}
       },
-      "block_order": ["g1", "q1", "q2", "g2", "q3", "q4", "g3", "q5", "g4", "q6"]
+      "block_order": ["g1","q1","q2","q3","q4","q5","g2","q6","q7","g3","q8","g4","q9","q10"]
     }
   },
   "order": ["main"]

@@ -1,0 +1,136 @@
+<section class="shipping-page" data-section-id="{{ section.id }}">
+  <div class="container container--narrow">
+    <header class="shipping-page__head">
+      <p class="shipping-page__eyebrow">{{ section.settings.eyebrow }}</p>
+      <h1 class="shipping-page__title">{{ section.settings.heading | default: page.title }}</h1>
+      {%- if section.settings.intro != blank -%}
+        <div class="shipping-page__intro rte">{{ section.settings.intro }}</div>
+      {%- endif -%}
+    </header>
+
+    {%- if section.settings.show_voyage -%}
+      <ol class="voyage">
+        <li class="voyage__step">
+          <span class="voyage__num">1</span>
+          <h2 class="voyage__heading">{{ section.settings.step1_title }}</h2>
+          <p class="voyage__body">{{ section.settings.step1_body }}</p>
+        </li>
+        <li class="voyage__step">
+          <span class="voyage__num">2</span>
+          <h2 class="voyage__heading">{{ section.settings.step2_title }}</h2>
+          <p class="voyage__body">{{ section.settings.step2_body }}</p>
+        </li>
+        <li class="voyage__step">
+          <span class="voyage__num">3</span>
+          <h2 class="voyage__heading">{{ section.settings.step3_title }}</h2>
+          <p class="voyage__body">{{ section.settings.step3_body }}</p>
+        </li>
+      </ol>
+    {%- endif -%}
+
+    {%- assign region_blocks = section.blocks | where: 'type', 'region' -%}
+    {%- if region_blocks.size > 0 -%}
+      <div class="ship-table-wrap">
+        <h2 class="shipping-page__sub">{{ section.settings.table_heading }}</h2>
+        <table class="ship-table">
+          <thead>
+            <tr>
+              <th>Destination</th>
+              <th>Standard</th>
+              <th>Express</th>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for block in region_blocks -%}
+              <tr {{ block.shopify_attributes }}>
+                <td class="ship-table__region">{{ block.settings.region }}</td>
+                <td>{{ block.settings.standard_time | default: '—' }}</td>
+                <td>{{ block.settings.express_time | default: '—' }}</td>
+              </tr>
+            {%- endfor -%}
+          </tbody>
+        </table>
+        {%- if section.settings.table_note != blank -%}
+          <p class="ship-table__note">{{ section.settings.table_note }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.carriers != blank -%}
+      <div class="carriers">
+        <span class="carriers__label">Shipped with</span>
+        <span class="carriers__list">{{ section.settings.carriers }}</span>
+      </div>
+    {%- endif -%}
+
+    {%- assign policy_blocks = section.blocks | where: 'type', 'policy' -%}
+    {%- if policy_blocks.size > 0 -%}
+      <div class="shipping-page__policies">
+        <h2 class="shipping-page__sub">{{ section.settings.policy_heading }}</h2>
+        {%- for block in policy_blocks -%}
+          <details class="faq__item" {{ block.shopify_attributes }}>
+            <summary>
+              <span>{{ block.settings.question }}</span>
+              <span class="faq__plus" aria-hidden="true">+</span>
+            </summary>
+            <div class="faq__answer rte">{{ block.settings.answer }}</div>
+          </details>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if page.content != blank -%}
+      <div class="shipping-page__body rte">{{ page.content }}</div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Shipping",
+  "settings": [
+    { "type": "text",     "id": "eyebrow", "label": "Eyebrow", "default": "Logistics" },
+    { "type": "text",     "id": "heading", "label": "Heading", "default": "Shipping & delivery" },
+    { "type": "richtext", "id": "intro",   "label": "Intro copy" },
+    { "type": "header",   "content": "Order voyage" },
+    { "type": "checkbox", "id": "show_voyage", "label": "Show 3-step voyage", "default": true },
+    { "type": "text",     "id": "step1_title", "label": "Step 1 title", "default": "Made to order" },
+    { "type": "text",     "id": "step1_body",  "label": "Step 1 body",
+      "default": "Each piece is printed for you. 98% of orders are produced within 48 hours." },
+    { "type": "text",     "id": "step2_title", "label": "Step 2 title", "default": "On the way" },
+    { "type": "text",     "id": "step2_body",  "label": "Step 2 body",
+      "default": "Your order ships with a tracked carrier. Transit time depends on destination and method." },
+    { "type": "text",     "id": "step3_title", "label": "Step 3 title", "default": "Delivered" },
+    { "type": "text",     "id": "step3_body",  "label": "Step 3 body",
+      "default": "It lands. Confirmed when the carrier marks the package Delivered." },
+    { "type": "header",   "content": "Delivery table" },
+    { "type": "text",     "id": "table_heading", "label": "Table heading", "default": "Estimated delivery" },
+    { "type": "text",     "id": "table_note",
+      "label": "Table note",
+      "default": "Estimates are carrier transit windows in business days, on top of ~2 days production. Remote areas may take longer." },
+    { "type": "header",   "content": "Carriers" },
+    { "type": "text",     "id": "carriers", "label": "Carriers", "default": "UPS · FedEx · USPS · CNE · YunExpress" },
+    { "type": "header",   "content": "Policies" },
+    { "type": "text",     "id": "policy_heading", "label": "Policy heading", "default": "Good to know" }
+  ],
+  "blocks": [
+    {
+      "type": "region",
+      "name": "Delivery region",
+      "settings": [
+        { "type": "text", "id": "region",        "label": "Destination",   "default": "United States" },
+        { "type": "text", "id": "standard_time", "label": "Standard time", "default": "7–12 business days" },
+        { "type": "text", "id": "express_time",  "label": "Express time",  "default": "3–5 business days" }
+      ]
+    },
+    {
+      "type": "policy",
+      "name": "Policy",
+      "settings": [
+        { "type": "text",     "id": "question", "label": "Question" },
+        { "type": "richtext", "id": "answer",   "label": "Answer" }
+      ]
+    }
+  ]
+}
+{% endschema %}

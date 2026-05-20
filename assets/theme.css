@@ -1464,6 +1464,114 @@ cookies-banner .btn { padding: 10px 16px; font-size: .75rem; }
 }
 .credo__body { margin: 0; color: var(--color-muted); }
 
+/* ---------- Shipping page ---------- */
+.shipping-page { padding-block: clamp(60px, 8vw, 120px); }
+.shipping-page__head { padding-bottom: 32px; border-bottom: 1px solid var(--color-line); margin-bottom: 40px; }
+.shipping-page__eyebrow {
+  font-family: var(--type-mono);
+  text-transform: uppercase;
+  letter-spacing: .25em;
+  font-size: .8rem;
+  color: var(--color-muted);
+  margin: 0 0 8px;
+}
+.shipping-page__title { font-size: var(--size-step-5); margin: 0 0 16px; }
+.shipping-page__intro { color: var(--color-muted); font-size: var(--size-step-1); max-width: 60ch; }
+.shipping-page__sub {
+  font-family: var(--font-heading-family);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: var(--size-step-2);
+  margin: 0 0 20px;
+}
+
+.voyage {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 56px;
+}
+@media (min-width: 750px) { .voyage { grid-template-columns: repeat(3, 1fr); } }
+.voyage__step {
+  border: 1px solid var(--color-line);
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.voyage__num {
+  font-family: var(--font-heading-family);
+  font-weight: 900;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--color-accent);
+}
+.voyage__heading { font-size: var(--size-step-1); margin: 0; text-transform: uppercase; }
+.voyage__body { margin: 0; color: var(--color-muted); font-size: .9rem; }
+
+.ship-table-wrap { margin-bottom: 56px; }
+.ship-table {
+  width: 100%;
+  border-top: 1px solid var(--color-line);
+}
+.ship-table thead th {
+  font-family: var(--type-mono);
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  font-size: .72rem;
+  color: var(--color-muted);
+  text-align: left;
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--color-line);
+}
+.ship-table tbody td {
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--color-line);
+  font-size: .9rem;
+}
+.ship-table__region {
+  font-family: var(--font-heading-family);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.ship-table thead th:first-child,
+.ship-table tbody td:first-child { padding-left: 0; }
+.ship-table__note {
+  margin-top: 16px;
+  font-family: var(--type-mono);
+  font-size: .72rem;
+  letter-spacing: .03em;
+  color: var(--color-muted);
+}
+
+.carriers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  padding: 20px 0;
+  border-block: 1px solid var(--color-line);
+  margin-bottom: 56px;
+}
+.carriers__label {
+  font-family: var(--type-mono);
+  text-transform: uppercase;
+  letter-spacing: .2em;
+  font-size: .72rem;
+  color: var(--color-muted);
+}
+.carriers__list {
+  font-family: var(--font-heading-family);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.shipping-page__policies .faq__item:first-of-type { border-top: 1px solid var(--color-line); }
+.shipping-page__body { margin-top: 40px; color: var(--color-muted); }
+
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
