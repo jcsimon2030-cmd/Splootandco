@@ -14,7 +14,7 @@
         "step3_title": "Delivered",
         "step3_body": "It lands. Delivery is confirmed once the carrier marks the package Delivered.",
         "table_heading": "Estimated delivery",
-        "table_note": "Windows are carrier transit time in business days, added on top of ~2 days production. Remote areas may run longer.",
+        "table_note": "Windows are carrier transit time in business days, added on top of ~2 days production. Shipping cost is calculated at checkout based on your cart size and destination. Remote areas may run longer.",
         "carriers": "UPS · FedEx · USPS · CNE · YunExpress",
         "policy_heading": "Good to know"
       },
