@@ -1,4 +1,13 @@
 {
-  "sections": { "main": { "type": "main-cart" } },
+  "sections": {
+    "main": {
+      "type": "main-cart",
+      "settings": {
+        "free_ship_threshold": 120,
+        "recommend_collection": "all",
+        "pay_chips": "VISA, MC, AMEX, SHOP, PAYPAL, KLARNA"
+      }
+    }
+  },
   "order": ["main"]
 }
