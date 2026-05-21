@@ -3,82 +3,94 @@
     "hero": {
       "type": "hero",
       "settings": {
-        "eyebrow": "Drop 01 · Heavy Armor",
-        "heading": "Stay soft. Stay feral.",
+        "show_crest": true,
+        "eyebrow": "DROP 01 · HEAVY ARMOR",
+        "heading_1": "Stay soft.",
+        "heading_2": "Stay feral.",
         "subheading": "Heavyweight cotton. Distressed woodcut graphics. Built for the days you need to be tender and terrifying in the same breath.",
-        "cta_label": "Enter the armory",
-        "cta_link": "shopify://collections/all",
-        "height": "tall",
-        "text_align": "left"
+        "cta1_label": "Enter the Armory →",
+        "cta1_link": "shopify://collections/all",
+        "cta2_label": "Loaves Napping Club",
+        "cta2_link": "shopify://pages/loaves",
+        "meta_left": "14oz · GARMENT-DYED · LIMITED RUN",
+        "meta_right": "OAK PARK, IL · EST 2024"
       }
     },
     "featured_drop": {
       "type": "featured-collection",
       "settings": {
-        "eyebrow": "Newly forged",
+        "eyebrow": "NEWLY FORGED",
         "heading": "From the armory",
         "collection": "all",
         "limit": 8,
-        "cols": "4"
+        "cols": "4",
+        "cta_label": "View all →"
       }
     },
     "collections": {
       "type": "collection-list",
       "settings": {
-        "eyebrow": "Browse",
-        "heading": "Pick your armor"
+        "eyebrow": "BROWSE",
+        "heading": "Pick your armor",
+        "note": "Four families. Same pack."
       },
       "blocks": {
-        "c1": { "type": "collection", "settings": { "collection": "heavy-armor" } },
-        "c2": { "type": "collection", "settings": { "collection": "light-armor" } },
-        "c3": { "type": "collection", "settings": { "collection": "love-is-dead" } },
-        "c4": { "type": "collection", "settings": { "collection": "dumb-bells" } }
+        "c1": { "type": "collection", "settings": { "collection": "heavy-armor", "eyebrow": "Drop 01", "tone": "coal", "blurb": "Heavyweight cotton. Distressed woodcut graphics. Built to outlive your worst week." } },
+        "c2": { "type": "collection", "settings": { "collection": "light-armor", "eyebrow": "Layer up / layer down", "tone": "iron", "blurb": "Tanks, lightweight tops, and second skins for the days the air does not forgive." } },
+        "c3": { "type": "collection", "settings": { "collection": "love-is-dead", "eyebrow": "Graphic capsule", "tone": "rust", "blurb": "Tender, ugly, true. The graphic capsule for soft hearts in heavy armor." } },
+        "c4": { "type": "collection", "settings": { "collection": "dumb-bells", "eyebrow": "Training & accessories", "tone": "olive", "blurb": "Caps, socks, straps and patches. The little ceremonial objects of the pack." } }
       },
       "block_order": ["c1", "c2", "c3", "c4"]
     },
     "manifesto": {
       "type": "manifesto",
       "settings": {
-        "eyebrow": "The credo",
+        "eyebrow": "THE CREDO",
         "body": "<p>The internet wants you to be a lone wolf. The internet is a sales funnel. <em>We are the pack.</em> Stay soft. Stay feral. Wear the armor.</p>",
-        "signature": "Sploot & Co"
+        "signature": "SPLOOT & CO"
       }
+    },
+    "credo": {
+      "type": "credo",
+      "settings": { "eyebrow": "THE FOUR LAWS OF THE PACK" },
+      "blocks": {
+        "l1": { "type": "law", "settings": { "title": "Stay soft", "body": "Tenderness is a weapon. Refuse to apologize for it." } },
+        "l2": { "type": "law", "settings": { "title": "Stay feral", "body": "The internet wants a lone wolf. We are the pack." } },
+        "l3": { "type": "law", "settings": { "title": "Wear the armor", "body": "Heavyweight cotton. Distressed graphics. Built to outlive your worst week." } },
+        "l4": { "type": "law", "settings": { "title": "Take the nap", "body": "Rest is rebellion. Lie down often. Dream meaner." } }
+      },
+      "block_order": ["l1", "l2", "l3", "l4"]
     },
     "lookbook": {
       "type": "lookbook",
       "settings": {
-        "eyebrow": "Editorial",
+        "eyebrow": "FIELD NOTES",
         "heading": "Loaves Napping Club",
-        "body": "<p>Field notes from the pack. Garments photographed in their natural habitat: soft hearts, hard mornings, longer walks than expected.</p>",
-        "cta_label": "Shop the lookbook",
+        "body": "Garments photographed in their natural habitat: soft hearts, hard mornings, longer walks than expected.",
+        "cta_label": "Shop the lookbook →",
         "cta_link": "shopify://collections/heavy-armor"
       },
       "blocks": {
-        "lb1": { "type": "tile", "settings": { "size": "lg",   "overlay": "I",   "caption": "Heavy Armor — Drop 01" } },
-        "lb2": { "type": "tile", "settings": { "size": "sm",   "overlay": "II",  "caption": "The Crest" } },
-        "lb3": { "type": "tile", "settings": { "size": "sm",   "overlay": "III", "caption": "Brutalist crest, soft heart" } },
-        "lb4": { "type": "tile", "settings": { "size": "wide", "overlay": "IV",  "caption": "We are the pack" } }
+        "lb1": { "type": "tile", "settings": { "size": "lg", "overlay": "I", "tone": "coal", "caption": "HEAVY ARMOR — DROP 01", "caption_position": "bl" } },
+        "lb2": { "type": "tile", "settings": { "size": "sm", "overlay": "II", "tone": "rust", "caption": "THE CREST", "caption_position": "tl" } },
+        "lb3": { "type": "tile", "settings": { "size": "sm", "overlay": "III", "tone": "iron", "caption": "SOFT HEART · HARD MORNING", "caption_position": "br" } },
+        "lb4": { "type": "tile", "settings": { "size": "wide", "overlay": "IV", "tone": "stone", "caption": "WE ARE THE PACK", "caption_position": "br" } }
       },
       "block_order": ["lb1", "lb2", "lb3", "lb4"]
     },
     "image_with_text": {
       "type": "image-with-text",
       "settings": {
-        "eyebrow": "About",
+        "photo_label": "ABOUT · THE PACK",
+        "tone": "rust",
+        "eyebrow": "ABOUT",
         "heading": "Built for the pack",
-        "body": "<p>Every garment is a small woodcut prayer for soft hearts who refuse to apologize. Premium heavyweight cotton. Distressed graphics. Made to last.</p>",
-        "cta_label": "Our story",
-        "cta_link": "/pages/about",
+        "body": "<p>Every garment is a small woodcut prayer for soft hearts who refuse to apologize. Premium heavyweight cotton. Distressed graphics. Made to last.</p><p>We started in a garage in Oak Park, Illinois with three blank tees and a pile of woodcuts. We've still never made anything we wouldn't wear ourselves.</p>",
+        "cta_label": "Our story →",
+        "cta_link": "shopify://pages/about",
         "layout": "right"
       }
     }
   },
-  "order": [
-    "hero",
-    "featured_drop",
-    "collections",
-    "manifesto",
-    "lookbook",
-    "image_with_text"
-  ]
+  "order": ["hero", "featured_drop", "collections", "manifesto", "credo", "lookbook", "image_with_text"]
 }

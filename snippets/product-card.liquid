@@ -1,49 +1,74 @@
+{%- comment -%}
+  Hover-swap product card — woodcut/brutalist.
+  Usage: {% render 'product-card', product: product, collection: collection %}
+{%- endcomment -%}
 {%- liquid
-  assign card_style = settings.card_style
-  assign img = product.featured_media.preview_image
+  assign p = product
+  assign img_a = p.featured_media
+  assign img_b = nil
+  for m in p.media
+    unless forloop.first
+      assign img_b = m
+      break
+    endunless
+  endfor
+  assign var = p.selected_or_first_available_variant
+  assign on_sale = false
+  if var.compare_at_price > var.price
+    assign on_sale = true
+  endif
 -%}
-<article class="product-card product-card--{{ card_style }}" data-product-handle="{{ product.handle }}">
-  <div class="product-card__media">
-    <a href="{{ product.url }}" class="product-card__link" aria-label="{{ product.title | escape }}">
-      {%- if img -%}
-        <img
-          src="{{ img | image_url: width: 800 }}"
-          srcset="{{ img | image_url: width: 400 }} 400w,
-                  {{ img | image_url: width: 600 }} 600w,
-                  {{ img | image_url: width: 800 }} 800w,
-                  {{ img | image_url: width: 1200 }} 1200w"
-          sizes="(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw"
-          alt="{{ img.alt | escape | default: product.title }}"
-          width="{{ img.width }}"
-          height="{{ img.height }}"
-          loading="lazy">
+<a href="{{ p.url | within: collection }}" class="pcard" data-product-card>
+  <div class="pcard-media">
+    <div class="pcard-photo-a">
+      {%- if img_a -%}
+        <img src="{{ img_a | image_url: width: 720 }}"
+             srcset="{{ img_a | image_url: width: 360 }} 360w, {{ img_a | image_url: width: 720 }} 720w, {{ img_a | image_url: width: 1080 }} 1080w"
+             sizes="(min-width: 1100px) 25vw, (min-width: 750px) 33vw, 50vw"
+             alt="{{ img_a.alt | escape | default: p.title }}"
+             width="{{ img_a.width }}" height="{{ img_a.height }}" loading="lazy">
       {%- else -%}
-        <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag }}</div>
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
       {%- endif -%}
-    </a>
-
-    {%- if product.compare_at_price > product.price -%}
-      <span class="product-card__tag">Sale</span>
-    {%- elsif product.available == false -%}
-      <span class="product-card__tag product-card__tag--out">Sold out</span>
+    </div>
+    {%- if img_b -%}
+      <div class="pcard-photo-b">
+        <img src="{{ img_b | image_url: width: 720 }}" alt="{{ img_b.alt | escape | default: p.title }}" loading="lazy">
+      </div>
     {%- endif -%}
 
-    <button
-      type="button"
-      class="product-card__quick-view"
-      data-quick-view
-      data-product-handle="{{ product.handle }}"
-      aria-label="Quick view {{ product.title | escape }}">
-      Quick view
-    </button>
+    {%- if p.available == false -%}
+      <span class="pcard-badge" style="background:var(--line);color:var(--ash)">SOLD OUT</span>
+    {%- elsif p.tags contains 'New' or p.tags contains 'new' -%}
+      <span class="pcard-badge">NEW</span>
+    {%- elsif on_sale -%}
+      <span class="pcard-badge">ON SALE</span>
+    {%- elsif p.tags contains 'Limited' or p.tags contains 'limited' -%}
+      <span class="pcard-badge">LIMITED</span>
+    {%- endif -%}
+
+    <button type="button" class="pcard-qv" data-quick-view data-product-handle="{{ p.handle }}">Quick View</button>
   </div>
 
-  <div class="product-card__info">
-    <h3 class="product-card__title">
-      <a href="{{ product.url }}">{{ product.title }}</a>
-    </h3>
-    <div class="product-card__price">
-      {%- render 'price', product: product, show_from: true -%}
+  <div class="pcard-info">
+    <div>
+      {%- if p.type != blank -%}
+        <p class="pcard-tag">{{ p.type }}</p>
+      {%- else -%}
+        <p class="pcard-tag">{{ p.vendor }}</p>
+      {%- endif -%}
+      <h4 class="pcard-name">{{ p.title | escape }}</h4>
     </div>
+    {% render 'price', product: p, use_variant: true, show_from: true %}
   </div>
-</article>
+
+  {%- for opt in p.options_with_values -%}
+    {%- assign d = opt.name | downcase -%}
+    {%- if d == 'color' or d == 'colour' -%}
+      <div class="pcard-colors">
+        {%- for v in opt.values limit: 4 -%}<span class="pcard-color">{{ v }}</span>{%- endfor -%}
+        {%- if opt.values.size > 4 -%}<span class="pcard-color">+{{ opt.values.size | minus: 4 }}</span>{%- endif -%}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+</a>

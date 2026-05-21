@@ -1,25 +1,24 @@
-<section class="iwt iwt--{{ section.settings.layout }}" data-section-id="{{ section.id }}">
-  <div class="container iwt__inner">
-    <div class="iwt__media">
-      {%- if section.settings.image -%}
-        <img
-          src="{{ section.settings.image | image_url: width: 1200 }}"
-          alt="{{ section.settings.image.alt | escape | default: section.settings.heading }}"
-          width="{{ section.settings.image.width }}"
-          height="{{ section.settings.image.height }}"
-          loading="lazy">
-      {%- else -%}
-        {{ 'lifestyle-1' | placeholder_svg_tag }}
-      {%- endif -%}
+<section class="iwt" data-section-id="{{ section.id }}">
+  <div class="container iwt-grid">
+    <div class="iwt-media"{% if section.settings.layout == 'right' %} style="order:2"{% endif %}>
+      <div class="photo photo-{{ section.settings.tone }} photo-figure">
+        {%- if section.settings.image -%}
+          <img src="{{ section.settings.image | image_url: width: 1400 }}"
+               srcset="{{ section.settings.image | image_url: width: 700 }} 700w, {{ section.settings.image | image_url: width: 1400 }} 1400w"
+               sizes="(min-width: 750px) 50vw, 100vw"
+               alt="{{ section.settings.image.alt | escape | default: section.settings.heading }}" loading="lazy">
+        {%- else -%}
+          <div class="silhouette"></div>
+        {%- endif -%}
+        {%- if section.settings.photo_label != blank -%}<div class="photo-label">{{ section.settings.photo_label }}</div>{%- endif -%}
+      </div>
     </div>
-    <div class="iwt__text">
-      {%- if section.settings.eyebrow != blank -%}
-        <p class="iwt__eyebrow">{{ section.settings.eyebrow }}</p>
-      {%- endif -%}
-      <h2 class="iwt__heading">{{ section.settings.heading }}</h2>
-      <div class="iwt__body rte">{{ section.settings.body }}</div>
+    <div class="iwt-body">
+      {%- if section.settings.eyebrow != blank -%}<p class="eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      {%- if section.settings.heading != blank -%}<h2 class="iwt-h">{{ section.settings.heading }}</h2>{%- endif -%}
+      <div class="rte">{{ section.settings.body }}</div>
       {%- if section.settings.cta_label != blank -%}
-        <a href="{{ section.settings.cta_link }}" class="btn btn--outline">{{ section.settings.cta_label }}</a>
+        <a href="{{ section.settings.cta_link | default: '#' }}" class="btn btn-ghost" style="margin-top:24px">{{ section.settings.cta_label }}</a>
       {%- endif -%}
     </div>
   </div>
@@ -29,26 +28,27 @@
 {
   "name": "Image with text",
   "settings": [
-    { "type": "image_picker", "id": "image",      "label": "Image" },
-    { "type": "text",         "id": "eyebrow",    "label": "Eyebrow", "default": "About" },
-    { "type": "text",         "id": "heading",    "label": "Heading", "default": "Built for the pack" },
-    { "type": "richtext",     "id": "body",       "label": "Body",
-      "default": "<p>Heavyweight cotton. Distressed woodcut graphics. Garments that hold up to long walks, hard days, and short tempers.</p>" },
-    { "type": "text",         "id": "cta_label",  "label": "Button label", "default": "Read more" },
-    { "type": "url",          "id": "cta_link",   "label": "Button link" },
-    {
-      "type": "select",
-      "id": "layout",
-      "label": "Image position",
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "photo_label", "label": "Image corner label", "default": "ABOUT · THE PACK" },
+    { "type": "select", "id": "tone", "label": "Placeholder tone",
       "options": [
-        { "value": "left",  "label": "Left" },
+        { "value": "coal", "label": "Coal" },
+        { "value": "rust", "label": "Rust" },
+        { "value": "iron", "label": "Iron" },
+        { "value": "olive", "label": "Olive" }
+      ], "default": "rust" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "ABOUT" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Built for the pack" },
+    { "type": "richtext", "id": "body", "label": "Body",
+      "default": "<p>Every garment is a small woodcut prayer for soft hearts who refuse to apologize. Premium heavyweight cotton. Distressed graphics. Made to last.</p><p>We started in a garage in Oak Park, Illinois with three blank tees and a pile of woodcuts. We've still never made anything we wouldn't wear ourselves.</p>" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Our story →" },
+    { "type": "url", "id": "cta_link", "label": "Button link" },
+    { "type": "select", "id": "layout", "label": "Image position",
+      "options": [
+        { "value": "left", "label": "Left" },
         { "value": "right", "label": "Right" }
-      ],
-      "default": "left"
-    }
+      ], "default": "left" }
   ],
-  "presets": [
-    { "name": "Image with text" }
-  ]
+  "presets": [{ "name": "Image with text" }]
 }
 {% endschema %}

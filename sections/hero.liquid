@@ -1,66 +1,75 @@
-<section
-  class="hero hero--{{ section.settings.height }} hero--align-{{ section.settings.text_align }}"
-  data-section-id="{{ section.id }}"
-  {% if section.settings.bg_image %}style="background-image:url('{{ section.settings.bg_image | image_url: width: 2400 }}');"{% endif %}>
-
-  <div class="hero__scrim"></div>
-
-  <div class="container hero__inner">
-    {%- if section.settings.eyebrow != blank -%}
-      <p class="hero__eyebrow">{{ section.settings.eyebrow }}</p>
-    {%- endif -%}
-
-    {%- if section.settings.heading != blank -%}
-      <h1 class="hero__heading">{{ section.settings.heading }}</h1>
-    {%- endif -%}
-
-    {%- if section.settings.subheading != blank -%}
-      <p class="hero__sub">{{ section.settings.subheading }}</p>
-    {%- endif -%}
-
-    {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
-      <a href="{{ section.settings.cta_link }}" class="btn btn--solid hero__cta">
-        {{ section.settings.cta_label }}
-      </a>
+<section class="hero" data-section-id="{{ section.id }}">
+  <div class="hero-photo">
+    {%- if section.settings.image -%}
+      <img src="{{ section.settings.image | image_url: width: 2400 }}"
+           srcset="{{ section.settings.image | image_url: width: 900 }} 900w, {{ section.settings.image | image_url: width: 1600 }} 1600w, {{ section.settings.image | image_url: width: 2400 }} 2400w"
+           sizes="100vw"
+           alt="{{ section.settings.image.alt | escape | default: section.settings.heading_1 }}"
+           width="{{ section.settings.image.width }}" height="{{ section.settings.image.height }}"
+           loading="eager" fetchpriority="high">
+    {%- else -%}
+      <div class="photo photo-coal photo-figure"><div class="silhouette"></div></div>
     {%- endif -%}
   </div>
+
+  {%- if section.settings.show_crest -%}
+    <div class="hero-crest" aria-hidden="true">{% render 'icon-crest', crest_size: 140 %}</div>
+  {%- endif -%}
+
+  <div class="hero-overlay">
+    <div class="container hero-inner">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow" style="color:var(--bone)">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h1 class="hero-h">
+        {{ section.settings.heading_1 }}
+        {%- if section.settings.heading_2 != blank -%}
+          <br><span style="color:var(--blood);font-style:italic">{{ section.settings.heading_2 }}</span>
+        {%- endif -%}
+      </h1>
+      {%- if section.settings.subheading != blank -%}
+        <p class="hero-sub">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+      {%- if section.settings.cta1_label != blank or section.settings.cta2_label != blank -%}
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:32px">
+          {%- if section.settings.cta1_label != blank -%}
+            <a href="{{ section.settings.cta1_link | default: routes.all_products_collection_url }}" class="btn btn-fill">{{ section.settings.cta1_label }}</a>
+          {%- endif -%}
+          {%- if section.settings.cta2_label != blank -%}
+            <a href="{{ section.settings.cta2_link | default: '/pages/loaves' }}" class="btn btn-ghost">{{ section.settings.cta2_label }}</a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if section.settings.meta_left != blank or section.settings.meta_right != blank -%}
+    <div class="hero-meta meta">
+      <span>{{ section.settings.meta_left }}</span>
+      <span>{{ section.settings.meta_right }}</span>
+    </div>
+  {%- endif -%}
 </section>
 
 {% schema %}
 {
   "name": "Hero",
   "settings": [
-    { "type": "image_picker", "id": "bg_image",    "label": "Background image" },
-    { "type": "text",         "id": "eyebrow",     "label": "Eyebrow", "default": "Drop 01" },
-    { "type": "text",         "id": "heading",     "label": "Heading", "default": "We are the pack." },
-    { "type": "textarea",     "id": "subheading",  "label": "Subheading", "default": "Heavy armor for soft hearts. Built for the days you need to be feral and tender in the same breath." },
-    { "type": "text",         "id": "cta_label",   "label": "Button label", "default": "Enter the armory" },
-    { "type": "url",          "id": "cta_link",    "label": "Button link" },
-    {
-      "type": "select",
-      "id": "height",
-      "label": "Height",
-      "options": [
-        { "value": "short",  "label": "Short" },
-        { "value": "medium", "label": "Medium" },
-        { "value": "tall",   "label": "Tall" },
-        { "value": "full",   "label": "Full viewport" }
-      ],
-      "default": "tall"
-    },
-    {
-      "type": "select",
-      "id": "text_align",
-      "label": "Text alignment",
-      "options": [
-        { "value": "left",   "label": "Left" },
-        { "value": "center", "label": "Center" }
-      ],
-      "default": "left"
-    }
+    { "type": "image_picker", "id": "image", "label": "Background image" },
+    { "type": "checkbox", "id": "show_crest", "label": "Show crest", "default": true },
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "DROP 01 · HEAVY ARMOR" },
+    { "type": "text", "id": "heading_1", "label": "Heading line 1", "default": "Stay soft." },
+    { "type": "text", "id": "heading_2", "label": "Heading line 2 (accent)", "default": "Stay feral." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Heavyweight cotton. Distressed woodcut graphics. Built for the days you need to be tender and terrifying in the same breath." },
+    { "type": "text", "id": "cta1_label", "label": "Primary button", "default": "Enter the Armory →" },
+    { "type": "url", "id": "cta1_link", "label": "Primary button link" },
+    { "type": "text", "id": "cta2_label", "label": "Secondary button", "default": "Loaves Napping Club" },
+    { "type": "url", "id": "cta2_link", "label": "Secondary button link" },
+    { "type": "header", "content": "Meta strip" },
+    { "type": "text", "id": "meta_left", "label": "Meta left", "default": "14oz · GARMENT-DYED · LIMITED RUN" },
+    { "type": "text", "id": "meta_right", "label": "Meta right", "default": "OAK PARK, IL · EST 2024" }
   ],
-  "presets": [
-    { "name": "Hero" }
-  ]
+  "presets": [{ "name": "Hero" }]
 }
 {% endschema %}

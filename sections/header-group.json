@@ -4,22 +4,18 @@
   "sections": {
     "announcement": {
       "type": "announcement-bar",
+      "settings": { "speed": 48 },
       "blocks": {
-        "msg-1": {
-          "type": "message",
-          "settings": {
-            "text": "Printed to order · Shipped worldwide · We are the pack."
-          }
-        }
+        "a1": { "type": "message", "settings": { "text": "DROP 01 — HEAVY ARMOR IN THE ARMORY" } },
+        "a2": { "type": "message", "settings": { "text": "FREE PACKWIDE SHIPPING OVER $120" } },
+        "a3": { "type": "message", "settings": { "text": "STAY SOFT · STAY FERAL" } },
+        "a4": { "type": "message", "settings": { "text": "LOAVES NAPPING CLUB — MEMBERSHIP IS FREE" } }
       },
-      "block_order": ["msg-1"]
+      "block_order": ["a1", "a2", "a3", "a4"]
     },
     "header": {
       "type": "header",
-      "settings": {
-        "menu": "main-menu",
-        "sticky": true
-      }
+      "settings": { "menu": "main-menu" }
     }
   },
   "order": ["announcement", "header"]

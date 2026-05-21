@@ -2,26 +2,24 @@
   "type": "footer",
   "name": "Footer group",
   "sections": {
-    "newsletter": {
-      "type": "newsletter",
-      "settings": {
-        "heading": "Join the pack",
-        "subheading": "First looks, drops, and packwide signal. No spam."
-      }
-    },
     "footer": {
       "type": "footer",
       "settings": {
-        "menu": "footer",
-        "tagline": "Heavy armor for soft hearts."
-      }
-    },
-    "cookies": {
-      "type": "cookies-banner",
-      "settings": {
-        "text": "We use cookies for cart and basic analytics. No selling your soul."
-      }
+        "show_newsletter": true,
+        "newsletter_eyebrow": "JOIN THE PACK",
+        "newsletter_heading": "First looks. Drops. Packwide signal. No spam.",
+        "tagline": "Heavyweight cotton. Distressed woodcut graphics. Built for soft hearts who refuse to apologize. We are the pack.",
+        "location": "OAK PARK, IL",
+        "bottom_center": "MADE FOR THE PACK",
+        "bottom_right": "STAY SOFT · STAY FERAL"
+      },
+      "blocks": {
+        "c1": { "type": "menu", "settings": { "heading": "The Armory", "menu": "main-menu" } },
+        "c2": { "type": "menu", "settings": { "heading": "The Pack", "menu": "footer" } },
+        "c3": { "type": "menu", "settings": { "heading": "Help", "menu": "footer" } }
+      },
+      "block_order": ["c1", "c2", "c3"]
     }
   },
-  "order": ["newsletter", "footer", "cookies"]
+  "order": ["footer"]
 }

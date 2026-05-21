@@ -1,63 +1,51 @@
-<section class="lookbook" data-section-id="{{ section.id }}">
-  {%- if section.settings.eyebrow != blank or section.settings.heading != blank -%}
-    <div class="container lookbook__head">
-      {%- if section.settings.eyebrow != blank -%}
-        <p class="lookbook__eyebrow">{{ section.settings.eyebrow }}</p>
-      {%- endif -%}
-      {%- if section.settings.heading != blank -%}
-        <h2 class="lookbook__heading">{{ section.settings.heading }}</h2>
-      {%- endif -%}
-      {%- if section.settings.body != blank -%}
-        <div class="lookbook__intro rte">{{ section.settings.body }}</div>
-      {%- endif -%}
-    </div>
-  {%- endif -%}
+<section class="lookbook-block" data-section-id="{{ section.id }}">
+  <div class="container">
+    <header class="sect-head">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+        {%- if section.settings.heading != blank -%}<h2 class="sect-h">{{ section.settings.heading }}</h2>{%- endif -%}
+        {%- if section.settings.body != blank -%}<p class="sect-blurb">{{ section.settings.body }}</p>{%- endif -%}
+      </div>
+    </header>
+  </div>
 
-  <div class="lookbook__grid">
+  <div class="lb-grid">
     {%- for block in section.blocks -%}
-      {%- assign size = block.settings.size -%}
-      {%- assign img = block.settings.image -%}
-      <figure class="lookbook__tile lookbook__tile--{{ size }}" {{ block.shopify_attributes }}>
-        {%- if block.settings.link != blank -%}
-          <a href="{{ block.settings.link }}" class="lookbook__link" aria-label="{{ block.settings.caption | escape | default: 'Lookbook tile' }}">
-        {%- endif -%}
-
-        {%- if img -%}
-          <img
-            src="{{ img | image_url: width: 1800 }}"
-            srcset="{{ img | image_url: width: 600 }} 600w,
-                    {{ img | image_url: width: 1200 }} 1200w,
-                    {{ img | image_url: width: 1800 }} 1800w"
-            sizes="(min-width: 990px) 50vw, 100vw"
-            alt="{{ img.alt | escape | default: block.settings.caption }}"
-            width="{{ img.width }}"
-            height="{{ img.height }}"
-            loading="lazy">
-        {%- else -%}
-          {{ 'lifestyle-1' | placeholder_svg_tag }}
-        {%- endif -%}
-
-        {%- if block.settings.caption != blank or block.settings.overlay != blank -%}
-          <figcaption class="lookbook__caption lookbook__caption--{{ block.settings.caption_position }}">
-            {%- if block.settings.overlay != blank -%}
-              <p class="lookbook__overlay">{{ block.settings.overlay }}</p>
-            {%- endif -%}
-            {%- if block.settings.caption != blank -%}
-              <p class="lookbook__cap-text">{{ block.settings.caption }}</p>
-            {%- endif -%}
+      {%- liquid
+        assign size_class = ''
+        if block.settings.size == 'lg'
+          assign size_class = 'lb-lg'
+        elsif block.settings.size == 'wide'
+          assign size_class = 'lb-wide'
+        endif
+        assign img = block.settings.image
+      -%}
+      <figure class="lb-tile {{ size_class }}" {{ block.shopify_attributes }}>
+        {%- if block.settings.link != blank -%}<a href="{{ block.settings.link }}" aria-label="{{ block.settings.caption | escape }}" style="position:absolute;inset:0;z-index:5">{%- endif -%}
+        <div class="photo photo-{{ block.settings.tone }} photo-figure">
+          {%- if img -%}
+            <img src="{{ img | image_url: width: 1600 }}"
+                 srcset="{{ img | image_url: width: 700 }} 700w, {{ img | image_url: width: 1600 }} 1600w"
+                 sizes="(min-width: 1100px) 50vw, 100vw"
+                 alt="{{ img.alt | escape | default: block.settings.caption }}" loading="lazy">
+          {%- else -%}
+            <div class="silhouette"></div>
+          {%- endif -%}
+        </div>
+        {%- if block.settings.overlay != blank or block.settings.caption != blank -%}
+          <figcaption class="lb-cap lb-cap-{{ block.settings.caption_position }}">
+            {%- if block.settings.overlay != blank -%}<p class="lb-overlay">{{ block.settings.overlay }}</p>{%- endif -%}
+            {%- if block.settings.caption != blank -%}<p class="lb-cap-txt">{{ block.settings.caption }}</p>{%- endif -%}
           </figcaption>
         {%- endif -%}
-
-        {%- if block.settings.link != blank -%}
-          </a>
-        {%- endif -%}
+        {%- if block.settings.link != blank -%}</a>{%- endif -%}
       </figure>
     {%- endfor -%}
   </div>
 
-  {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
-    <div class="container lookbook__cta">
-      <a href="{{ section.settings.cta_link }}" class="btn btn--outline">{{ section.settings.cta_label }}</a>
+  {%- if section.settings.cta_label != blank -%}
+    <div class="container" style="text-align:center;margin-top:48px">
+      <a href="{{ section.settings.cta_link | default: routes.all_products_collection_url }}" class="btn btn-ghost">{{ section.settings.cta_label }}</a>
     </div>
   {%- endif -%}
 </section>
@@ -66,47 +54,42 @@
 {
   "name": "Lookbook",
   "settings": [
-    { "type": "text",     "id": "eyebrow", "label": "Eyebrow",   "default": "Editorial" },
-    { "type": "text",     "id": "heading", "label": "Heading",   "default": "Loaves Napping Club" },
-    { "type": "richtext", "id": "body",    "label": "Intro copy",
-      "default": "<p>Field notes from the pack. Garments photographed in their natural habitat: soft hearts, hard mornings, longer walks than expected.</p>" },
-    { "type": "text",     "id": "cta_label", "label": "Button label", "default": "Shop the lookbook" },
-    { "type": "url",      "id": "cta_link",  "label": "Button link" }
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "FIELD NOTES" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Loaves Napping Club" },
+    { "type": "textarea", "id": "body", "label": "Intro copy", "default": "Garments photographed in their natural habitat: soft hearts, hard mornings, longer walks than expected." },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Shop the lookbook →" },
+    { "type": "url", "id": "cta_link", "label": "Button link" }
   ],
   "max_blocks": 8,
   "blocks": [
     {
       "type": "tile",
-      "name": "Image",
+      "name": "Tile",
       "settings": [
-        { "type": "image_picker", "id": "image",   "label": "Image" },
-        { "type": "text",         "id": "caption", "label": "Caption" },
-        { "type": "text",         "id": "overlay", "label": "Overlay text (large)" },
-        { "type": "url",          "id": "link",    "label": "Link" },
-        {
-          "type": "select",
-          "id": "size",
-          "label": "Tile size",
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "overlay", "label": "Overlay numeral", "default": "I" },
+        { "type": "text", "id": "caption", "label": "Caption" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "select", "id": "size", "label": "Tile size",
           "options": [
-            { "value": "sm",   "label": "Small (1 column)" },
-            { "value": "lg",   "label": "Large (spans 2 cols)" },
-            { "value": "tall", "label": "Tall (spans 2 rows)" },
-            { "value": "wide", "label": "Wide (full width)" }
-          ],
-          "default": "sm"
-        },
-        {
-          "type": "select",
-          "id": "caption_position",
-          "label": "Caption position",
+            { "value": "sm", "label": "Small (1 col)" },
+            { "value": "lg", "label": "Large (2 cols)" },
+            { "value": "wide", "label": "Wide (full row)" }
+          ], "default": "sm" },
+        { "type": "select", "id": "caption_position", "label": "Caption position",
           "options": [
             { "value": "bl", "label": "Bottom left" },
             { "value": "br", "label": "Bottom right" },
-            { "value": "tl", "label": "Top left" },
-            { "value": "tr", "label": "Top right" }
-          ],
-          "default": "bl"
-        }
+            { "value": "tl", "label": "Top left" }
+          ], "default": "bl" },
+        { "type": "select", "id": "tone", "label": "Placeholder tone",
+          "options": [
+            { "value": "coal", "label": "Coal" },
+            { "value": "stone", "label": "Stone" },
+            { "value": "iron", "label": "Iron" },
+            { "value": "rust", "label": "Rust" },
+            { "value": "olive", "label": "Olive" }
+          ], "default": "coal" }
       ]
     }
   ],
@@ -114,10 +97,10 @@
     {
       "name": "Lookbook",
       "blocks": [
-        { "type": "tile", "settings": { "size": "lg", "overlay": "I",   "caption": "Heavy Armor — Drop 01" } },
-        { "type": "tile", "settings": { "size": "sm", "overlay": "II",  "caption": "The Crest" } },
-        { "type": "tile", "settings": { "size": "sm", "overlay": "III", "caption": "Brutalist crest, soft heart" } },
-        { "type": "tile", "settings": { "size": "wide", "overlay": "IV", "caption": "We are the pack" } }
+        { "type": "tile", "settings": { "size": "lg", "overlay": "I", "tone": "coal", "caption": "HEAVY ARMOR — DROP 01", "caption_position": "bl" } },
+        { "type": "tile", "settings": { "size": "sm", "overlay": "II", "tone": "rust", "caption": "THE CREST", "caption_position": "tl" } },
+        { "type": "tile", "settings": { "size": "sm", "overlay": "III", "tone": "iron", "caption": "SOFT HEART · HARD MORNING", "caption_position": "br" } },
+        { "type": "tile", "settings": { "size": "wide", "overlay": "IV", "tone": "stone", "caption": "WE ARE THE PACK", "caption_position": "br" } }
       ]
     }
   ]

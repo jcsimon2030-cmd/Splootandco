@@ -1,0 +1,19 @@
+{%- liquid
+  assign s = size | default: 20
+  assign sw = stroke | default: 1.6
+-%}
+<svg width="{{ s }}" height="{{ s }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ sw }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {%- case name -%}
+    {%- when 'search' -%}<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+    {%- when 'bag' -%}<path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/>
+    {%- when 'account' -%}<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>
+    {%- when 'menu' -%}<path d="M3 7h18M3 12h18M3 17h18"/>
+    {%- when 'close' -%}<path d="M5 5l14 14M19 5L5 19"/>
+    {%- when 'arrow' -%}<path d="M5 12h14M13 6l6 6-6 6"/>
+    {%- when 'plus' -%}<path d="M12 5v14M5 12h14"/>
+    {%- when 'minus' -%}<path d="M5 12h14"/>
+    {%- when 'chev' -%}<path d="M9 6l6 6-6 6"/>
+    {%- when 'star' -%}<path d="M12 3l2.7 6 6.3.6-4.8 4.3 1.5 6.4L12 17l-5.7 3.3 1.5-6.4L3 9.6 9.3 9 12 3z"/>
+    {%- when 'heart' -%}<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>
+  {%- endcase -%}
+</svg>

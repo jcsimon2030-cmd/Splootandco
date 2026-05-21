@@ -1,0 +1,60 @@
+<section class="credo" data-section-id="{{ section.id }}">
+  <div class="container">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="eyebrow credo-eyebrow">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+    <ul class="credo-list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          case forloop.index
+            when 1 then assign num = 'I'
+            when 2 then assign num = 'II'
+            when 3 then assign num = 'III'
+            when 4 then assign num = 'IV'
+            when 5 then assign num = 'V'
+            when 6 then assign num = 'VI'
+            when 7 then assign num = 'VII'
+            when 8 then assign num = 'VIII'
+          endcase
+        -%}
+        <li class="credo-item" {{ block.shopify_attributes }}>
+          <span class="credo-num">{{ block.settings.number | default: num }}</span>
+          <h3 class="credo-h">{{ block.settings.title }}</h3>
+          <p class="credo-body">{{ block.settings.body }}</p>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Credo",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "THE FOUR LAWS OF THE PACK" }
+  ],
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "law",
+      "name": "Law",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Numeral (optional override)" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Stay soft" },
+        { "type": "textarea", "id": "body", "label": "Body", "default": "Tenderness is a weapon. Refuse to apologize for it." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Credo",
+      "blocks": [
+        { "type": "law", "settings": { "title": "Stay soft", "body": "Tenderness is a weapon. Refuse to apologize for it." } },
+        { "type": "law", "settings": { "title": "Stay feral", "body": "The internet wants a lone wolf. We are the pack." } },
+        { "type": "law", "settings": { "title": "Wear the armor", "body": "Heavyweight cotton. Distressed graphics. Built to outlive your worst week." } },
+        { "type": "law", "settings": { "title": "Take the nap", "body": "Rest is rebellion. Lie down often. Dream meaner." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

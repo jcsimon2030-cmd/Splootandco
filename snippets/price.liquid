@@ -1,13 +1,12 @@
 {%- liquid
   if use_variant and product.selected_or_first_available_variant
     assign target = product.selected_or_first_available_variant
+  elsif variant
+    assign target = variant
   elsif product
     assign target = product
-  else
-    assign target = placeholder
   endif
-
-  assign price = target.price | default: 0
+  assign price = target.price | default: product.price | default: 0
   assign compare = target.compare_at_price
   assign on_sale = false
   if compare and compare > price
@@ -15,14 +14,7 @@
   endif
 -%}
 <span class="price{% if on_sale %} price--sale{% endif %}">
-  {%- if on_sale -%}
-    <span class="price__sale">{{ price | money }}</span>
-    <s class="price__compare">{{ compare | money }}</s>
-  {%- else -%}
-    {%- if product.price_varies and show_from -%}
-      <span class="price__from">{{ 'products.product.from_price' | t: price: price | money }}</span>
-    {%- else -%}
-      <span class="price__current">{{ price | money }}</span>
-    {%- endif -%}
-  {%- endif -%}
+  {%- if product.price_varies and show_from -%}<span class="price-from">From</span>{%- endif -%}
+  <span class="price-now">{{ price | money }}</span>
+  {%- if on_sale -%}<s class="price-was">{{ compare | money }}</s>{%- endif -%}
 </span>

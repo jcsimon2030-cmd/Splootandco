@@ -1,31 +1,34 @@
-<section class="collection-list" data-section-id="{{ section.id }}">
+<section class="col-strip" data-section-id="{{ section.id }}">
   <div class="container">
-    <header class="section-head">
-      <p class="section-head__eyebrow">{{ section.settings.eyebrow }}</p>
-      <h2 class="section-head__title">{{ section.settings.heading }}</h2>
+    <header class="sect-head">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}<p class="eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+        {%- if section.settings.heading != blank -%}<h2 class="sect-h">{{ section.settings.heading }}</h2>{%- endif -%}
+      </div>
+      {%- if section.settings.note != blank -%}<p class="sect-note">{{ section.settings.note }}</p>{%- endif -%}
     </header>
 
-    <div class="collection-list__grid">
+    <div class="col-grid">
       {%- for block in section.blocks -%}
-        {%- assign col = collections[block.settings.collection] -%}
-        {%- assign img = block.settings.image | default: col.image -%}
-        <a href="{{ col.url }}" class="collection-tile" {{ block.shopify_attributes }}>
-          <div class="collection-tile__media">
+        {%- assign coll = collections[block.settings.collection] -%}
+        {%- assign img = block.settings.image | default: coll.image | default: coll.featured_image -%}
+        <a href="{{ coll.url | default: '#' }}" class="col-tile" {{ block.shopify_attributes }}>
+          <div class="photo photo-{{ block.settings.tone }}">
             {%- if img -%}
-              <img
-                src="{{ img | image_url: width: 900 }}"
-                alt="{{ col.title }}"
-                width="900"
-                height="1200"
-                loading="lazy">
-            {%- else -%}
-              {{ 'collection-1' | placeholder_svg_tag }}
+              <img src="{{ img | image_url: width: 1000 }}"
+                   srcset="{{ img | image_url: width: 500 }} 500w, {{ img | image_url: width: 1000 }} 1000w"
+                   sizes="(min-width: 1100px) 25vw, (min-width: 750px) 50vw, 100vw"
+                   alt="{{ img.alt | escape | default: coll.title }}" loading="lazy">
             {%- endif -%}
           </div>
-          <div class="collection-tile__caption">
-            <h3 class="collection-tile__title">{{ col.title }}</h3>
-            <span class="collection-tile__count">{{ col.products_count }} items</span>
+          <div class="col-tile-caption">
+            <div>
+              {%- if block.settings.eyebrow != blank -%}<p class="col-tile-eyebrow">{{ block.settings.eyebrow }}</p>{%- endif -%}
+              <h3 class="col-tile-h">{{ block.settings.title | default: coll.title }}</h3>
+            </div>
+            <p class="col-tile-count">{{ coll.all_products_count | default: 0 }} pieces</p>
           </div>
+          {%- if block.settings.blurb != blank -%}<p class="col-tile-blurb">{{ block.settings.blurb }}</p>{%- endif -%}
         </a>
       {%- endfor -%}
     </div>
@@ -36,22 +39,43 @@
 {
   "name": "Collection list",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Browse" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Pick your armor" }
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "BROWSE" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Pick your armor" },
+    { "type": "text", "id": "note", "label": "Right-aligned note", "default": "Four families. Same pack." }
   ],
-  "max_blocks": 9,
+  "max_blocks": 8,
   "blocks": [
     {
       "type": "collection",
-      "name": "Collection",
+      "name": "Collection tile",
       "settings": [
-        { "type": "collection",  "id": "collection", "label": "Collection" },
-        { "type": "image_picker","id": "image",      "label": "Override image (optional)" }
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "title", "label": "Override title (optional)" },
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow" },
+        { "type": "textarea", "id": "blurb", "label": "Blurb under tile" },
+        { "type": "image_picker", "id": "image", "label": "Override image (optional)" },
+        { "type": "select", "id": "tone", "label": "Placeholder tone",
+          "options": [
+            { "value": "coal", "label": "Coal" },
+            { "value": "stone", "label": "Stone" },
+            { "value": "iron", "label": "Iron" },
+            { "value": "rust", "label": "Rust" },
+            { "value": "olive", "label": "Olive" },
+            { "value": "shadow", "label": "Shadow" }
+          ], "default": "coal" }
       ]
     }
   ],
   "presets": [
-    { "name": "Collection list" }
+    {
+      "name": "Collection list",
+      "blocks": [
+        { "type": "collection", "settings": { "eyebrow": "Drop 01", "tone": "coal", "blurb": "Heavyweight cotton. Distressed woodcut graphics. Built to outlive your worst week." } },
+        { "type": "collection", "settings": { "eyebrow": "Layer up / layer down", "tone": "iron", "blurb": "Tanks, lightweight tops, and second skins for the days the air does not forgive." } },
+        { "type": "collection", "settings": { "eyebrow": "Graphic capsule", "tone": "rust", "blurb": "Tender, ugly, true. The graphic capsule for soft hearts in heavy armor." } },
+        { "type": "collection", "settings": { "eyebrow": "Training & accessories", "tone": "olive", "blurb": "Caps, socks, straps and patches. The little ceremonial objects of the pack." } }
+      ]
+    }
   ]
 }
 {% endschema %}

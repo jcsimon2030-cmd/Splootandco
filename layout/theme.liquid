@@ -3,13 +3,16 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="{{ settings.color_bg }}">
+    <meta name="theme-color" content="#0B0B0B">
     <link rel="canonical" href="{{ canonical_url }}">
     {%- if settings.favicon != blank -%}
       <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32 }}">
     {%- endif -%}
 
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,900&family=Archivo+Narrow:wght@400;500;600;700&family=Assistant:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 
     <title>
       {{ page_title }}
@@ -30,36 +33,6 @@
 
     {{ 'theme.css' | asset_url | stylesheet_tag }}
     <script src="{{ 'theme.js' | asset_url }}" defer></script>
-
-    {%- liquid
-      assign body_font = settings.type_body_font
-      assign heading_font = settings.type_heading_font
-    -%}
-    <style>
-      {{ body_font | font_face: font_display: 'swap' }}
-      {{ heading_font | font_face: font_display: 'swap' }}
-      {{ body_font | font_modifier: 'italic' | font_face: font_display: 'swap' }}
-      {{ body_font | font_modifier: 'bold' | font_face: font_display: 'swap' }}
-
-      :root {
-        --color-bg: {{ settings.color_bg }};
-        --color-fg: {{ settings.color_fg }};
-        --color-accent: {{ settings.color_accent }};
-        --color-muted: {{ settings.color_muted }};
-        --color-line: {{ settings.color_line }};
-
-        --font-body-family: {{ body_font.family }}, {{ body_font.fallback_families }};
-        --font-body-style: {{ body_font.style }};
-        --font-body-weight: {{ body_font.weight }};
-
-        --font-heading-family: {{ heading_font.family }}, {{ heading_font.fallback_families }};
-        --font-heading-style: {{ heading_font.style }};
-        --font-heading-weight: {{ heading_font.weight }};
-
-        --container-w: {{ settings.container_width }}px;
-        --container-gutter: clamp(16px, 4vw, 32px);
-      }
-    </style>
   </head>
 
   <body class="template-{{ template.name }}{% if template.suffix %} template-{{ template.name }}-{{ template.suffix }}{% endif %}">
@@ -74,6 +47,6 @@
     {% sections 'footer-group' %}
 
     <cart-drawer id="CartDrawer" hidden></cart-drawer>
-    {% render 'quick-view' %}
+    <quick-view id="QuickView" hidden></quick-view>
   </body>
 </html>

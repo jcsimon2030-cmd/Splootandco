@@ -1,82 +1,60 @@
-<site-header class="header{% if section.settings.sticky %} header--sticky{% endif %}" data-section-id="{{ section.id }}">
-  <div class="header__inner container">
-    <button type="button" class="header__menu-toggle" aria-controls="MobileNav" aria-expanded="false">
-      {% render 'icon-menu' %}
-      <span class="visually-hidden">{{ 'accessibility.menu' | t }}</span>
-    </button>
+<site-header class="hdr" data-section-id="{{ section.id }}">
+  <div class="hdr-inner">
+    <div class="hdr-left">
+      <button type="button" class="hdr-icon hdr-menu" data-menu-open aria-label="{{ 'accessibility.menu' | t }}" aria-expanded="false">
+        {% render 'icon', name: 'menu', size: 22 %}
+      </button>
+      <nav class="hdr-nav" aria-label="Primary">
+        {%- for link in linklists[section.settings.menu].links -%}
+          <a href="{{ link.url }}" class="hdr-link{% if link.current or link.child_active %} is-active{% endif %}">{{ link.title }}</a>
+        {%- endfor -%}
+      </nav>
+    </div>
 
-    <a href="{{ routes.root_url }}" class="header__logo">
+    <a class="hdr-logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
       {%- if settings.logo != blank -%}
-        <img
-          src="{{ settings.logo | image_url: width: settings.logo_width | times: 2 }}"
-          alt="{{ shop.name }}"
-          width="{{ settings.logo_width }}"
-          height="{{ settings.logo_width | divided_by: settings.logo.aspect_ratio | round }}">
+        <img src="{{ settings.logo | image_url: width: 360 }}" alt="{{ shop.name | escape }}"
+             width="180" height="44" loading="eager">
       {%- else -%}
-        <span class="header__wordmark">{{ shop.name }}</span>
+        {% render 'wordmark', ws: 22 %}
       {%- endif -%}
     </a>
 
-    <nav class="header__nav" aria-label="Primary">
-      {%- for link in linklists[section.settings.menu].links -%}
-        <a href="{{ link.url }}" class="header__nav-link{% if link.active %} is-active{% endif %}">
-          {{ link.title }}
-        </a>
-      {%- endfor -%}
-    </nav>
-
-    <div class="header__actions">
-      <button type="button" class="header__action" data-search-toggle aria-label="{{ 'accessibility.search' | t }}" aria-expanded="false" aria-controls="PredictiveSearch">
-        {% render 'icon-search' %}
-      </button>
-      <a href="{{ routes.cart_url }}" class="header__action header__cart" data-cart-toggle aria-label="{{ 'accessibility.cart' | t }}">
-        {% render 'icon-cart' %}
-        <span class="header__cart-count" data-cart-count>{{ cart.item_count }}</span>
+    <div class="hdr-actions">
+      <a class="hdr-icon" href="{{ routes.search_url }}" aria-label="{{ 'accessibility.search' | t }}">
+        {% render 'icon', name: 'search', size: 18 %}
+      </a>
+      <a class="hdr-icon" href="{{ routes.account_url | default: '/account' }}" aria-label="Account">
+        {% render 'icon', name: 'account', size: 18 %}
+      </a>
+      <a class="hdr-icon hdr-cart" href="{{ routes.cart_url }}" data-cart-open aria-label="{{ 'accessibility.cart' | t }}">
+        {% render 'icon', name: 'bag', size: 18 %}
+        {%- if cart.item_count > 0 -%}
+          <span class="hdr-cart-count" data-cart-count>{{ cart.item_count }}</span>
+        {%- endif -%}
       </a>
     </div>
   </div>
 
-  <predictive-search id="PredictiveSearch" hidden>
-    <form action="{{ routes.search_url }}" method="get" class="predictive-search__form" role="search">
-      <input
-        type="search"
-        name="q"
-        autocomplete="off"
-        placeholder="{{ 'general.search.placeholder' | t }}"
-        aria-label="{{ 'accessibility.search' | t }}"
-        data-predictive-input>
-      <button type="button" class="predictive-search__close" data-search-close aria-label="{{ 'accessibility.close' | t }}">
-        {% render 'icon-close' %}
+  <div class="mobile-nav" data-mobile-nav>
+    <div class="mobile-nav-head">
+      {% render 'wordmark', ws: 22 %}
+      <button type="button" class="hdr-icon" data-menu-close aria-label="{{ 'accessibility.close' | t }}">
+        {% render 'icon', name: 'close', size: 22 %}
       </button>
-    </form>
-    <div class="predictive-search__results" data-predictive-results hidden></div>
-  </predictive-search>
-
-  <div class="header__mobile-nav" id="MobileNav" hidden>
-    <nav aria-label="Mobile">
-      {%- for link in linklists[section.settings.menu].links -%}
-        <a href="{{ link.url }}" class="header__mobile-link">{{ link.title }}</a>
-      {%- endfor -%}
-    </nav>
+    </div>
+    {%- for link in linklists[section.settings.menu].links -%}
+      <a href="{{ link.url }}" class="mobile-nav-link">{{ link.title }}</a>
+    {%- endfor -%}
   </div>
+  <div class="scrim" data-menu-scrim></div>
 </site-header>
 
 {% schema %}
 {
   "name": "Header",
   "settings": [
-    {
-      "type": "link_list",
-      "id": "menu",
-      "default": "main-menu",
-      "label": "Menu"
-    },
-    {
-      "type": "checkbox",
-      "id": "sticky",
-      "default": true,
-      "label": "Sticky header"
-    }
+    { "type": "link_list", "id": "menu", "default": "main-menu", "label": "Menu" }
   ]
 }
 {% endschema %}

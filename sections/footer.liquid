@@ -1,35 +1,55 @@
-<footer class="footer" data-section-id="{{ section.id }}">
-  <div class="container footer__grid">
-    <div class="footer__brand">
-      <a href="{{ routes.root_url }}" class="footer__logo">
-        {%- if settings.logo != blank -%}
-          <img src="{{ settings.logo | image_url: width: 180 }}" alt="{{ shop.name }}" width="120" height="auto">
-        {%- else -%}
-          <span class="footer__wordmark">{{ shop.name }}</span>
+<footer class="ftr" data-section-id="{{ section.id }}">
+  <div class="container">
+    {%- if section.settings.show_newsletter -%}
+      <div class="ftr-newsletter" style="padding-bottom:48px;margin-bottom:48px;border-bottom:1px solid var(--line)">
+        <p class="eyebrow" style="margin-bottom:8px">{{ section.settings.newsletter_eyebrow }}</p>
+        <h3 style="font-family:var(--f-display);font-size:clamp(2rem,4vw,3rem);font-weight:900;text-transform:uppercase;margin:0;letter-spacing:-.02em;line-height:.95;max-width:24ch">{{ section.settings.newsletter_heading }}</h3>
+        {%- form 'customer', class: 'ftr-newsletter-form' -%}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div style="display:grid;grid-template-columns:1fr auto;gap:8px;max-width:520px;margin-top:24px">
+            <input type="email" name="contact[email]" required placeholder="you@somewhere.com"
+                   style="background:transparent;border:1.5px solid var(--bone);color:var(--bone);padding:14px 18px;font-family:var(--f-mono);font-size:13px">
+            <button type="submit" class="btn btn-fill">Subscribe</button>
+          </div>
+          {%- if form.posted_successfully? -%}
+            <p class="form-status form-status--success" style="margin-top:12px;display:inline-block">✦ You're in. Welcome to the pack.</p>
+          {%- elsif form.errors -%}
+            <p class="form-status form-status--error" style="margin-top:12px;display:inline-block">{{ form.errors.translated_fields.email }} {{ form.errors.messages.email }}</p>
+          {%- endif -%}
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+
+    <div class="ftr-grid">
+      <div>
+        {% render 'wordmark', ws: 32 %}
+        {%- if section.settings.tagline != blank -%}
+          <p style="max-width:34ch;margin-top:16px;color:var(--ash);font-size:14px">{{ section.settings.tagline }}</p>
         {%- endif -%}
-      </a>
-      {%- if section.settings.tagline != blank -%}
-        <p class="footer__tagline">{{ section.settings.tagline }}</p>
-      {%- endif -%}
-    </div>
+        <div style="display:flex;gap:8px;margin-top:24px">
+          {%- assign socials = '' -%}
+          {%- if settings.social_instagram != blank -%}<a href="{{ settings.social_instagram }}" rel="noopener" aria-label="Instagram" style="width:40px;height:40px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em">IG</a>{%- endif -%}
+          {%- if settings.social_tiktok != blank -%}<a href="{{ settings.social_tiktok }}" rel="noopener" aria-label="TikTok" style="width:40px;height:40px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em">TIK</a>{%- endif -%}
+          {%- if settings.social_youtube != blank -%}<a href="{{ settings.social_youtube }}" rel="noopener" aria-label="YouTube" style="width:40px;height:40px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em">YT</a>{%- endif -%}
+          {%- if settings.social_twitter != blank -%}<a href="{{ settings.social_twitter }}" rel="noopener" aria-label="X" style="width:40px;height:40px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em">X</a>{%- endif -%}
+        </div>
+      </div>
 
-    <nav class="footer__nav" aria-label="Footer">
-      {%- for link in linklists[section.settings.menu].links -%}
-        <a href="{{ link.url }}" class="footer__link">{{ link.title }}</a>
+      {%- for block in section.blocks -%}
+        <div {{ block.shopify_attributes }}>
+          <h4 class="ftr-h">{{ block.settings.heading }}</h4>
+          {%- for link in linklists[block.settings.menu].links -%}
+            <a class="ftr-link" href="{{ link.url }}">{{ link.title }}</a>
+          {%- endfor -%}
+        </div>
       {%- endfor -%}
-    </nav>
-
-    <div class="footer__social">
-      {%- if settings.social_instagram != blank -%}<a href="{{ settings.social_instagram }}" rel="noopener" aria-label="Instagram">IG</a>{%- endif -%}
-      {%- if settings.social_tiktok    != blank -%}<a href="{{ settings.social_tiktok }}"    rel="noopener" aria-label="TikTok">TT</a>{%- endif -%}
-      {%- if settings.social_twitter   != blank -%}<a href="{{ settings.social_twitter }}"   rel="noopener" aria-label="X">X</a>{%- endif -%}
-      {%- if settings.social_youtube   != blank -%}<a href="{{ settings.social_youtube }}"   rel="noopener" aria-label="YouTube">YT</a>{%- endif -%}
     </div>
-  </div>
 
-  <div class="container footer__bottom">
-    <small>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</small>
-    <small class="footer__pack">— we are the pack —</small>
+    <div class="ftr-bottom">
+      <span>© {{ 'now' | date: '%Y' }} {{ shop.name }} · {{ section.settings.location }}</span>
+      <span>{{ section.settings.bottom_center }}</span>
+      <span>{{ section.settings.bottom_right }}</span>
+    </div>
   </div>
 </footer>
 
@@ -37,17 +57,36 @@
 {
   "name": "Footer",
   "settings": [
+    { "type": "header", "content": "Newsletter" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Show newsletter strip", "default": true },
+    { "type": "text", "id": "newsletter_eyebrow", "label": "Newsletter eyebrow", "default": "JOIN THE PACK" },
+    { "type": "text", "id": "newsletter_heading", "label": "Newsletter heading", "default": "First looks. Drops. Packwide signal. No spam." },
+    { "type": "header", "content": "Brand" },
+    { "type": "textarea", "id": "tagline", "label": "Tagline", "default": "Heavyweight cotton. Distressed woodcut graphics. Built for soft hearts who refuse to apologize. We are the pack." },
+    { "type": "header", "content": "Bottom bar" },
+    { "type": "text", "id": "location", "label": "Location", "default": "OAK PARK, IL" },
+    { "type": "text", "id": "bottom_center", "label": "Bottom center", "default": "MADE FOR THE PACK" },
+    { "type": "text", "id": "bottom_right", "label": "Bottom right", "default": "STAY SOFT · STAY FERAL" }
+  ],
+  "max_blocks": 3,
+  "blocks": [
     {
-      "type": "link_list",
-      "id": "menu",
-      "default": "footer",
-      "label": "Menu"
-    },
+      "type": "menu",
+      "name": "Link column",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "The Pack" },
+        { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" }
+      ]
+    }
+  ],
+  "presets": [
     {
-      "type": "text",
-      "id": "tagline",
-      "label": "Tagline",
-      "default": "Heavy armor for soft hearts."
+      "name": "Footer",
+      "blocks": [
+        { "type": "menu", "settings": { "heading": "The Armory" } },
+        { "type": "menu", "settings": { "heading": "The Pack" } },
+        { "type": "menu", "settings": { "heading": "Help" } }
+      ]
     }
   ]
 }

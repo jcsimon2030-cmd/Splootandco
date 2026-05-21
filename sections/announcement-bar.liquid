@@ -1,12 +1,18 @@
-<div class="announcement-bar" data-section-id="{{ section.id }}">
-  <div class="announcement-bar__track">
-    {%- for block in section.blocks -%}
-      <span class="announcement-bar__item" {{ block.shopify_attributes }}>
-        {%- if block.settings.link != blank -%}
-          <a href="{{ block.settings.link }}">{{ block.settings.text }}</a>
-        {%- else -%}
-          {{ block.settings.text }}
-        {%- endif -%}
+{%- comment -%} Brutalist scrolling marquee announcement bar. {%- endcomment -%}
+<div class="marquee" data-section-id="{{ section.id }}">
+  <div class="marquee-track" style="animation-duration:{{ section.settings.speed | default: 48 }}s">
+    {%- for i in (1..2) -%}
+      <span style="display:inline-flex;gap:48px;align-items:center" aria-hidden="{% if i == 2 %}true{% else %}false{% endif %}">
+        {%- for block in section.blocks -%}
+          <span style="display:inline-flex;gap:48px;align-items:center" {{ block.shopify_attributes }}>
+            {%- if block.settings.link != blank -%}
+              <a href="{{ block.settings.link }}">{{ block.settings.text }}</a>
+            {%- else -%}
+              <span>{{ block.settings.text }}</span>
+            {%- endif -%}
+            <span class="star">✦</span>
+          </span>
+        {%- endfor -%}
       </span>
     {%- endfor -%}
   </div>
@@ -15,14 +21,28 @@
 {% schema %}
 {
   "name": "Announcement bar",
-  "max_blocks": 5,
+  "settings": [
+    { "type": "range", "id": "speed", "label": "Scroll duration (s)", "min": 20, "max": 80, "step": 2, "default": 48 }
+  ],
+  "max_blocks": 8,
   "blocks": [
     {
       "type": "message",
       "name": "Message",
       "settings": [
-        { "type": "text", "id": "text", "label": "Text", "default": "Printed to order · Shipped worldwide" },
+        { "type": "text", "id": "text", "label": "Text", "default": "STAY SOFT · STAY FERAL" },
         { "type": "url",  "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar",
+      "blocks": [
+        { "type": "message", "settings": { "text": "DROP 01 — HEAVY ARMOR IN THE ARMORY" } },
+        { "type": "message", "settings": { "text": "FREE SHIPPING OVER $120" } },
+        { "type": "message", "settings": { "text": "STAY SOFT · STAY FERAL" } },
+        { "type": "message", "settings": { "text": "LOAVES NAPPING CLUB — MEMBERSHIP IS FREE" } }
       ]
     }
   ]

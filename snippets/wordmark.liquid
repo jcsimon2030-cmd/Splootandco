@@ -1,0 +1,4 @@
+{%- comment -%} Renders the SPLOOT & CO wordmark. Param: ws (font-size px, default 22). {%- endcomment -%}
+{%- assign ws = ws | default: 22 -%}
+{%- assign amp = ws | times: 0.5 | round -%}
+<span class="hdr-wordmark" style="font-size:{{ ws }}px"><span>SPLOOT</span><span class="amp" style="font-size:{{ amp }}px">&amp;</span><span>CO</span></span>

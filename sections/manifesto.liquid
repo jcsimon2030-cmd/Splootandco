@@ -1,11 +1,11 @@
-<section class="manifesto" data-section-id="{{ section.id }}">
-  <div class="container manifesto__inner">
+<section class="manifesto-block" data-section-id="{{ section.id }}">
+  <div class="container">
     {%- if section.settings.eyebrow != blank -%}
-      <p class="manifesto__eyebrow">{{ section.settings.eyebrow }}</p>
+      <p class="eyebrow" style="color:var(--ash)">{{ section.settings.eyebrow }}</p>
     {%- endif -%}
-    <p class="manifesto__body">{{ section.settings.body }}</p>
+    <p class="manifesto-body">{{ section.settings.body }}</p>
     {%- if section.settings.signature != blank -%}
-      <p class="manifesto__sig">— {{ section.settings.signature }}</p>
+      <p class="meta" style="color:var(--ash)">— {{ section.settings.signature }}</p>
     {%- endif -%}
   </div>
 </section>
@@ -14,17 +14,11 @@
 {
   "name": "Manifesto",
   "settings": [
-    { "type": "text",     "id": "eyebrow",   "label": "Eyebrow", "default": "The credo" },
-    {
-      "type": "richtext",
-      "id": "body",
-      "label": "Body",
-      "default": "<p>The internet wants you to be a lone wolf. The internet is a sales funnel. We are the pack. Stay soft. Stay feral. Wear the armor.</p>"
-    },
-    { "type": "text", "id": "signature", "label": "Signature", "default": "Sploot & Co" }
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "THE CREDO" },
+    { "type": "richtext", "id": "body", "label": "Body",
+      "default": "<p>The internet wants you to be a lone wolf. The internet is a sales funnel. We are the pack. Stay soft. Stay feral. Wear the armor.</p>" },
+    { "type": "text", "id": "signature", "label": "Signature", "default": "SPLOOT & CO" }
   ],
-  "presets": [
-    { "name": "Manifesto" }
-  ]
+  "presets": [{ "name": "Manifesto" }]
 }
 {% endschema %}
