@@ -3,6 +3,16 @@
   assign featured = current_variant.featured_media | default: product.featured_media
   assign crumb_col = collection | default: product.collections.first
   assign vendor_line = product.type | default: product.vendor
+  comment
+    Build the gallery from square/portrait photos only — print-on-demand
+    size-chart images are wide (aspect >= 1.5) and get filtered out.
+  endcomment
+  assign gallery_count = 0
+  for m in product.media
+    if m.media_type == 'image' and m.preview_image.aspect_ratio < 1.5
+      assign gallery_count = gallery_count | plus: 1
+    endif
+  endfor
 -%}
 
 <main class="pdp" data-section-id="{{ section.id }}" data-product-id="{{ product.id }}">
@@ -24,20 +34,22 @@
                src="{{ featured | image_url: width: 1400 }}"
                srcset="{{ featured | image_url: width: 700 }} 700w, {{ featured | image_url: width: 1100 }} 1100w, {{ featured | image_url: width: 1600 }} 1600w"
                sizes="(min-width: 990px) 55vw, 100vw"
-               alt="{{ featured.alt | escape | default: product.title }}"
-               width="{{ featured.width }}" height="{{ featured.height }}" loading="eager">
+               alt="{{ featured.preview_image.alt | escape | default: product.title }}"
+               width="{{ featured.preview_image.width }}" height="{{ featured.preview_image.height }}" loading="eager">
         {%- else -%}
           {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
         {%- endif -%}
       </div>
-      {%- if product.media.size > 1 -%}
+      {%- if gallery_count > 1 -%}
         <div class="pdp-thumbs">
           {%- for media in product.media -%}
-            <button type="button" class="pdp-thumb{% if media.id == featured.id %} is-active{% endif %}"
-                    data-pdp-thumb data-full="{{ media | image_url: width: 1400 }}"
-                    data-media-id="{{ media.id }}" aria-label="View image {{ forloop.index }}">
-              <img src="{{ media | image_url: width: 200 }}" alt="" width="88" height="88" loading="lazy">
-            </button>
+            {%- if media.media_type == 'image' and media.preview_image.aspect_ratio < 1.5 -%}
+              <button type="button" class="pdp-thumb{% if media.id == featured.id %} is-active{% endif %}"
+                      data-pdp-thumb data-full="{{ media | image_url: width: 1400 }}"
+                      data-media-id="{{ media.id }}" aria-label="View image {{ forloop.index }}">
+                <img src="{{ media | image_url: width: 200 }}" alt="" width="88" height="88" loading="lazy">
+              </button>
+            {%- endif -%}
           {%- endfor -%}
         </div>
       {%- endif -%}

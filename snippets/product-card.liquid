@@ -1,16 +1,25 @@
 {%- comment -%}
   Hover-swap product card — woodcut/brutalist.
-  Usage: {% render 'product-card', product: product, collection: collection %}
+  Picks the first two square/portrait product photos, skipping
+  landscape size-chart images. Usage:
+  {% render 'product-card', product: product, collection: collection %}
 {%- endcomment -%}
 {%- liquid
   assign p = product
-  assign img_a = p.featured_media
+  assign img_a = nil
   assign img_b = nil
   for m in p.media
-    unless forloop.first
+    if m.media_type != 'image'
+      continue
+    endif
+    if m.preview_image.aspect_ratio >= 1.5
+      continue
+    endif
+    if img_a == nil
+      assign img_a = m
+    elsif img_b == nil
       assign img_b = m
-      break
-    endunless
+    endif
   endfor
   assign var = p.selected_or_first_available_variant
   assign on_sale = false
@@ -25,15 +34,15 @@
         <img src="{{ img_a | image_url: width: 720 }}"
              srcset="{{ img_a | image_url: width: 360 }} 360w, {{ img_a | image_url: width: 720 }} 720w, {{ img_a | image_url: width: 1080 }} 1080w"
              sizes="(min-width: 1100px) 25vw, (min-width: 750px) 33vw, 50vw"
-             alt="{{ img_a.alt | escape | default: p.title }}"
-             width="{{ img_a.width }}" height="{{ img_a.height }}" loading="lazy">
+             alt="{{ img_a.preview_image.alt | escape | default: p.title }}"
+             width="{{ img_a.preview_image.width }}" height="{{ img_a.preview_image.height }}" loading="lazy">
       {%- else -%}
         {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
       {%- endif -%}
     </div>
     {%- if img_b -%}
       <div class="pcard-photo-b">
-        <img src="{{ img_b | image_url: width: 720 }}" alt="{{ img_b.alt | escape | default: p.title }}" loading="lazy">
+        <img src="{{ img_b | image_url: width: 720 }}" alt="" loading="lazy">
       </div>
     {%- endif -%}
 

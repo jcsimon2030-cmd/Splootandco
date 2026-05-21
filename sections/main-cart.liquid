@@ -31,7 +31,7 @@
               <div class="cart-line-product">
                 <a href="{{ line.url }}" class="cart-line-media">
                   {%- if line.image -%}
-                    <img src="{{ line.image | image_url: width: 240 }}" alt="{{ line.image.alt | escape | default: line.product.title }}" width="104" height="139" loading="lazy">
+                    <img src="{{ line.image | image_url: width: 240 }}" alt="{{ line.image.alt | escape | default: line.product.title }}" width="104" height="104" loading="lazy">
                   {%- endif -%}
                 </a>
                 <div class="cart-line-meta">

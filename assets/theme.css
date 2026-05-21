@@ -98,7 +98,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--f-sans);font-size
 @media (min-width:750px){.pgrid-3{grid-template-columns:repeat(3,1fr)}.pgrid-4{grid-template-columns:repeat(3,1fr)}}
 @media (min-width:1100px){.pgrid-3{grid-template-columns:repeat(3,1fr)}.pgrid-4{grid-template-columns:repeat(4,1fr)}}
 .pcard{display:block;color:inherit;padding-bottom:24px;cursor:pointer}
-.pcard-media{position:relative;aspect-ratio:3/4;background:#181818;overflow:hidden}
+.pcard-media{position:relative;aspect-ratio:1/1;background:#181818;overflow:hidden}
 .pcard-photo-a,.pcard-photo-b{position:absolute;inset:0;transition:opacity .35s ease}
 .pcard-photo-b{opacity:0}
 .pcard:hover .pcard-photo-a{opacity:0}
@@ -202,7 +202,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--f-sans);font-size
 .pdp-grid{display:grid;gap:clamp(32px,5vw,64px);padding-bottom:64px}
 @media (min-width:990px){.pdp-grid{grid-template-columns:1.25fr 1fr}}
 .pdp-gallery{display:flex;flex-direction:column;gap:8px;position:sticky;top:96px;align-self:start}
-.pdp-main{position:relative;aspect-ratio:4/5;background:var(--char);overflow:hidden}
+.pdp-main{position:relative;aspect-ratio:1/1;background:var(--char);overflow:hidden}
 .pdp-main .photo{position:absolute;inset:0}
 .pdp-thumbs{display:flex;gap:8px;flex-wrap:wrap}
 .pdp-thumb{width:88px;height:88px;background:var(--char);border:1px solid var(--line);padding:0;cursor:pointer;position:relative;overflow:hidden}
@@ -272,7 +272,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--f-sans);font-size
 .empty-h{font-family:var(--f-display);font-weight:900;text-transform:uppercase;font-size:24px;margin:0 0 8px}
 .empty-p{color:var(--ash);margin:0 0 24px}
 .cart-row{display:grid;grid-template-columns:88px 1fr auto;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
-.cart-row-media{aspect-ratio:3/4;background:var(--char)}
+.cart-row-media{aspect-ratio:1/1;background:var(--char)}
 .cart-row-name{font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:14px;margin:0 0 4px;line-height:1.2}
 .cart-row-variant{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ash);margin:0}
 .cart-row-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:12px}
@@ -299,7 +299,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--f-sans);font-size
 .cart-list-head{display:grid;grid-template-columns:1fr 80px 100px;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ash)}
 .cart-line{display:grid;grid-template-columns:1fr 80px 100px;gap:16px;padding:24px 0;border-bottom:1px solid var(--line);align-items:start}
 .cart-line-product{display:flex;gap:20px;min-width:0}
-.cart-line-media{flex:0 0 100px;aspect-ratio:3/4;background:var(--char)}
+.cart-line-media{flex:0 0 100px;aspect-ratio:1/1;background:var(--char)}
 .cart-line-name{font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:15px;letter-spacing:-.005em;margin:0 0 6px;display:block;color:var(--bone)}
 .cart-line-name:hover{color:var(--blood)}
 .cart-line-variant{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ash);margin:0 0 6px}
@@ -447,7 +447,7 @@ site-header,cart-drawer,quick-view,product-form{display:block}
 .qv-scrim{position:absolute;inset:0;background:rgba(0,0,0,.7)}
 .qv-panel{position:relative;background:var(--ink);border:1px solid var(--line);width:min(940px,100% - 32px);max-height:90vh;overflow-y:auto;display:grid;grid-template-columns:1fr}
 @media (min-width:750px){.qv-panel{grid-template-columns:1fr 1fr}}
-.qv-media{position:relative;background:var(--char);aspect-ratio:4/5;overflow:hidden}
+.qv-media{position:relative;background:var(--char);aspect-ratio:1/1;overflow:hidden}
 .qv-info{padding:32px clamp(20px,4vw,40px);display:flex;flex-direction:column;gap:16px}
 .qv-close{position:absolute;top:12px;right:14px;z-index:3;font-size:22px;line-height:1;color:var(--bone);width:40px;height:40px}
 .qv-close:hover{color:var(--blood)}
