@@ -1,15 +1,27 @@
-<section class="credo" data-section-id="{{ section.id }}">
+<section class="loaves-laws" data-section-id="{{ section.id }}">
   <div class="container">
-    <p class="credo__eyebrow">{{ section.settings.eyebrow }}</p>
-    <ol class="credo__list">
+    {%- if section.settings.eyebrow != blank -%}
+      <p class="eyebrow" style="text-align:center;color:var(--ash)">{{ section.settings.eyebrow }}</p>
+    {%- endif -%}
+    <ul class="loaves-laws-list">
       {%- for block in section.blocks -%}
-        <li class="credo__item" {{ block.shopify_attributes }}>
-          <span class="credo__num">{{ forloop.index | prepend: '00' | slice: -2, 2 }}</span>
-          <h3 class="credo__heading">{{ block.settings.title }}</h3>
-          <p class="credo__body">{{ block.settings.body }}</p>
+        {%- liquid
+          case forloop.index
+            when 1 then assign num = 'I'
+            when 2 then assign num = 'II'
+            when 3 then assign num = 'III'
+            when 4 then assign num = 'IV'
+            when 5 then assign num = 'V'
+            when 6 then assign num = 'VI'
+          endcase
+        -%}
+        <li class="loaves-law" {{ block.shopify_attributes }}>
+          <span class="loaves-law-num">{{ num }}</span>
+          <h3 class="loaves-law-h">{{ block.settings.title }}</h3>
+          <p class="loaves-law-b">{{ block.settings.body }}</p>
         </li>
       {%- endfor -%}
-    </ol>
+    </ul>
   </div>
 </section>
 
@@ -17,7 +29,7 @@
 {
   "name": "Loaves credo",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The four laws of the pack" }
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "THE FOUR LAWS OF THE PACK" }
   ],
   "max_blocks": 6,
   "blocks": [
@@ -25,10 +37,8 @@
       "type": "law",
       "name": "Law",
       "settings": [
-        { "type": "text",     "id": "title", "label": "Title", "default": "Stay soft" },
-        { "type": "textarea", "id": "body",
-          "label": "Body",
-          "default": "Tenderness is a weapon. Refuse to apologize for it." }
+        { "type": "text", "id": "title", "label": "Title", "default": "Stay soft" },
+        { "type": "textarea", "id": "body", "label": "Body", "default": "Tenderness is a weapon. Refuse to apologize for it." }
       ]
     }
   ],
@@ -36,14 +46,10 @@
     {
       "name": "Loaves credo",
       "blocks": [
-        { "type": "law", "settings": { "title": "Stay soft",
-            "body": "Tenderness is a weapon. Refuse to apologize for it." } },
-        { "type": "law", "settings": { "title": "Stay feral",
-            "body": "The internet wants a lone wolf. We are the pack." } },
-        { "type": "law", "settings": { "title": "Wear the armor",
-            "body": "Heavyweight cotton. Distressed graphics. Built to outlive your worst week." } },
-        { "type": "law", "settings": { "title": "Take the nap",
-            "body": "Rest is rebellion. Lie down often. Dream meaner." } }
+        { "type": "law", "settings": { "title": "Stay soft", "body": "Tenderness is a weapon. Refuse to apologize for it." } },
+        { "type": "law", "settings": { "title": "Stay feral", "body": "The internet wants a lone wolf. We are the pack." } },
+        { "type": "law", "settings": { "title": "Wear the armor", "body": "Heavyweight cotton. Distressed graphics. Built to outlive your worst week." } },
+        { "type": "law", "settings": { "title": "Take the nap", "body": "Rest is rebellion. Lie down often. Dream meaner." } }
       ]
     }
   ]

@@ -1,34 +1,34 @@
-<section class="collections-index" data-section-id="{{ section.id }}">
+<main class="col-strip" data-section-id="{{ section.id }}">
   <div class="container">
-    <header class="section-head">
-      <p class="section-head__eyebrow">All</p>
-      <h1 class="section-head__title">Collections</h1>
+    <header class="sect-head">
+      <div>
+        <p class="eyebrow">BROWSE</p>
+        <h1 class="sect-h">The Armory</h1>
+      </div>
+      <p class="sect-note">Every family. Same pack.</p>
     </header>
 
-    <div class="collection-list__grid">
+    <div class="col-grid">
       {%- for col in collections -%}
-        {%- if col.handle != 'frontpage' -%}
-          <a href="{{ col.url }}" class="collection-tile">
-            <div class="collection-tile__media">
-              {%- if col.image -%}
-                <img src="{{ col.image | image_url: width: 900 }}" alt="{{ col.title }}" width="900" height="1200" loading="lazy">
-              {%- else -%}
-                {{ 'collection-1' | placeholder_svg_tag }}
+        {%- unless col.handle == 'frontpage' -%}
+          {%- assign img = col.image | default: col.featured_image -%}
+          <a href="{{ col.url }}" class="col-tile">
+            <div class="photo photo-coal">
+              {%- if img -%}
+                <img src="{{ img | image_url: width: 1000 }}" alt="{{ img.alt | escape | default: col.title }}" loading="lazy">
               {%- endif -%}
             </div>
-            <div class="collection-tile__caption">
-              <h3 class="collection-tile__title">{{ col.title }}</h3>
-              <span class="collection-tile__count">{{ col.products_count }} items</span>
+            <div class="col-tile-caption">
+              <div><h3 class="col-tile-h">{{ col.title }}</h3></div>
+              <p class="col-tile-count">{{ col.all_products_count }} pieces</p>
             </div>
           </a>
-        {%- endif -%}
+        {%- endunless -%}
       {%- endfor -%}
     </div>
   </div>
-</section>
+</main>
 
 {% schema %}
-{
-  "name": "List collections"
-}
+{ "name": "List collections" }
 {% endschema %}

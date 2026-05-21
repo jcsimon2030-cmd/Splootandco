@@ -1,968 +1,478 @@
-/* =========================================================
+/* ============================================================
    SPLOOT & CO — theme.js
-   Vanilla + Web Components. No framework.
-   ========================================================= */
-
+   Vanilla JS + Web Components. Drives the storefront design:
+   mobile nav, cart drawer, product form, gallery, filters,
+   quick view. No framework.
+   ============================================================ */
 (() => {
   'use strict';
 
-  /* ----------------------------------------
-     <site-header> — sticky shadow + mobile nav toggle
-     ---------------------------------------- */
+  const FREE_SHIP = 12000; // cents — matches the cart free-ship threshold
+
+  /* ---------- helpers ---------- */
+  const money = (c) => '$' + (Number(c) / 100).toFixed(2);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+  ));
+  const isDesktop = () => window.matchMedia('(min-width: 750px)').matches;
+  const lockScroll = (on) => { document.body.style.overflow = on ? 'hidden' : ''; };
+
+  function setCartCount(count) {
+    document.querySelectorAll('[data-cart-count]').forEach((el) => { el.textContent = count; });
+    const cartLink = document.querySelector('.hdr-cart');
+    if (cartLink && count > 0 && !cartLink.querySelector('[data-cart-count]')) {
+      const span = document.createElement('span');
+      span.className = 'hdr-cart-count';
+      span.setAttribute('data-cart-count', '');
+      span.textContent = count;
+      cartLink.appendChild(span);
+    }
+    if (count === 0) {
+      document.querySelectorAll('[data-cart-count]').forEach((el) => el.remove());
+    }
+  }
+
+  async function getCart() {
+    const res = await fetch(`${window.Shopify?.routes?.root || '/'}cart.js`, { headers: { Accept: 'application/json' } });
+    return res.json();
+  }
+
+  /* ---------- mobile nav ---------- */
   class SiteHeader extends HTMLElement {
     connectedCallback() {
-      this.toggle = this.querySelector('.header__menu-toggle');
-      this.mobileNav = this.querySelector('.header__mobile-nav');
+      this.nav = this.querySelector('[data-mobile-nav]');
+      this.scrim = this.querySelector('[data-menu-scrim]');
+      this.querySelectorAll('[data-menu-open]').forEach((b) => b.addEventListener('click', () => this.openNav()));
+      this.querySelectorAll('[data-menu-close]').forEach((b) => b.addEventListener('click', () => this.closeNav()));
+      if (this.scrim) this.scrim.addEventListener('click', () => this.closeNav());
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.closeNav(); });
 
-      if (this.toggle && this.mobileNav) {
-        this.toggle.addEventListener('click', () => this.toggleNav());
-      }
-
-      this.cartLinks = this.querySelectorAll('[data-cart-toggle]');
-      this.cartLinks.forEach(link => {
+      this.querySelectorAll('[data-cart-open]').forEach((link) => {
         link.addEventListener('click', (e) => {
-          // Open drawer only on desktop. Mobile keeps native /cart navigation.
-          if (window.matchMedia('(min-width: 750px)').matches) {
-            const drawer = document.getElementById('CartDrawer');
-            if (drawer) {
-              e.preventDefault();
-              drawer.open();
-            }
-          }
+          const drawer = document.getElementById('CartDrawer');
+          if (drawer && isDesktop()) { e.preventDefault(); drawer.open(); }
         });
       });
     }
-
-    toggleNav() {
-      const open = this.toggle.getAttribute('aria-expanded') === 'true';
-      this.toggle.setAttribute('aria-expanded', String(!open));
-      if (open) {
-        this.mobileNav.setAttribute('hidden', '');
-      } else {
-        this.mobileNav.removeAttribute('hidden');
-      }
+    openNav() {
+      if (!this.nav) return;
+      this.nav.classList.add('is-on');
+      this.scrim && this.scrim.classList.add('is-on');
+      this.querySelector('[data-menu-open]')?.setAttribute('aria-expanded', 'true');
+      lockScroll(true);
+    }
+    closeNav() {
+      if (!this.nav) return;
+      this.nav.classList.remove('is-on');
+      this.scrim && this.scrim.classList.remove('is-on');
+      this.querySelector('[data-menu-open]')?.setAttribute('aria-expanded', 'false');
+      lockScroll(false);
     }
   }
   customElements.define('site-header', SiteHeader);
 
-  /* ----------------------------------------
-     <product-form> — async add to cart + variant sync
-     ---------------------------------------- */
+  /* ---------- cart drawer ---------- */
+  class CartDrawer extends HTMLElement {
+    connectedCallback() {
+      this.removeAttribute('hidden');
+      this._loaded = false;
+      this._open = false;
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this._open) this.close(); });
+    }
+    async open() {
+      if (!this._loaded) { await this.refresh(); this._loaded = true; }
+      this._open = true;
+      const d = this.querySelector('.drawer'); const s = this.querySelector('.scrim');
+      d && d.classList.add('is-on'); s && s.classList.add('is-on');
+      lockScroll(true);
+    }
+    close() {
+      this._open = false;
+      const d = this.querySelector('.drawer'); const s = this.querySelector('.scrim');
+      d && d.classList.remove('is-on'); s && s.classList.remove('is-on');
+      lockScroll(false);
+    }
+    async refresh() {
+      try { this.render(await getCart()); } catch (e) { console.warn('Cart fetch failed', e); }
+    }
+    async change(key, qty) {
+      const res = await fetch(`${window.Shopify?.routes?.root || '/'}cart/change.js`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ id: key, quantity: qty })
+      });
+      this.render(await res.json());
+    }
+    render(cart) {
+      setCartCount(cart.item_count);
+      const unlocked = cart.total_price >= FREE_SHIP;
+      const pct = Math.min(100, (cart.total_price / FREE_SHIP) * 100);
+      const ship = unlocked
+        ? '<p class="ship-msg done">✦ FREE SHIPPING UNLOCKED</p>'
+        : `<p class="ship-msg">${money(FREE_SHIP - cart.total_price)} more for free packwide shipping</p>`;
+
+      const rows = cart.items.map((it, i) => `
+        <article class="cart-row">
+          <a href="${it.url}" class="cart-row-media">${it.image ? `<img src="${it.image}" alt="" loading="lazy">` : ''}</a>
+          <div class="cart-row-detail">
+            <h4 class="cart-row-name"><a href="${it.url}">${esc(it.product_title)}</a></h4>
+            ${it.variant_title && it.variant_title !== 'Default Title' ? `<p class="cart-row-variant">${esc(it.variant_title)}</p>` : ''}
+            <div class="cart-row-bottom">
+              <div class="qty qty-sm">
+                <button type="button" data-d-down data-key="${it.key}" aria-label="Decrease">−</button>
+                <span>${it.quantity}</span>
+                <button type="button" data-d-up data-key="${it.key}" aria-label="Increase">+</button>
+              </div>
+              <button type="button" class="cart-remove" data-d-remove data-key="${it.key}">Remove</button>
+            </div>
+          </div>
+          <div class="cart-row-price">${money(it.final_line_price)}</div>
+        </article>`).join('');
+
+      this.innerHTML = `
+        <div class="scrim" data-d-close></div>
+        <aside class="drawer" role="dialog" aria-label="Cart">
+          <header class="drawer-head">
+            <div><p class="eyebrow">YOUR PACK</p>
+              <h3 class="drawer-h">Cart · ${cart.item_count} ${cart.item_count === 1 ? 'piece' : 'pieces'}</h3></div>
+            <button type="button" class="drawer-close" data-d-close aria-label="Close">✕</button>
+          </header>
+          <div class="ship-progress">${ship}<div class="ship-bar"><div class="ship-fill" style="width:${pct}%"></div></div></div>
+          <div class="drawer-body">
+            ${cart.items.length === 0
+              ? `<div class="drawer-empty"><p class="empty-h">Your cart is empty.</p>
+                  <p class="empty-p">Nothing in the pack yet. Enter the armory.</p>
+                  <a class="btn btn-fill" href="/collections/heavy-armor">Browse Heavy Armor →</a></div>`
+              : rows}
+          </div>
+          ${cart.items.length === 0 ? '' : `
+          <footer class="drawer-foot">
+            <div class="totals">
+              <div><span>Subtotal</span><span>${money(cart.total_price)}</span></div>
+              <div class="totals-total"><span>Total</span><span>${money(cart.total_price)}</span></div>
+            </div>
+            <p class="cart-note">Taxes &amp; shipping calculated at checkout.</p>
+            <a class="btn btn-blood btn-block" href="${window.Shopify?.routes?.root || '/'}checkout">Checkout — ${money(cart.total_price)}</a>
+            <a class="link-btn" href="${window.Shopify?.routes?.root || '/'}cart">View full cart</a>
+          </footer>`}
+        </aside>`;
+
+      if (this._open) {
+        this.querySelector('.drawer').classList.add('is-on');
+        this.querySelector('.scrim').classList.add('is-on');
+      }
+      this.querySelectorAll('[data-d-close]').forEach((b) => b.addEventListener('click', () => this.close()));
+      this.querySelectorAll('[data-d-up]').forEach((b) => b.addEventListener('click', () => this.bump(b, 1)));
+      this.querySelectorAll('[data-d-down]').forEach((b) => b.addEventListener('click', () => this.bump(b, -1)));
+      this.querySelectorAll('[data-d-remove]').forEach((b) => b.addEventListener('click', () => this.change(b.dataset.key, 0)));
+    }
+    bump(btn, dir) {
+      const span = btn.parentElement.querySelector('span');
+      const next = Math.max(0, (parseInt(span.textContent, 10) || 0) + dir);
+      this.change(btn.dataset.key, next);
+    }
+  }
+  customElements.define('cart-drawer', CartDrawer);
+
+  function openDrawerAfterAdd() {
+    const drawer = document.getElementById('CartDrawer');
+    if (drawer) { drawer.refresh().then(() => { if (isDesktop()) drawer.open(); }); }
+  }
+
+  /* ---------- product form (PDP) ---------- */
   class ProductForm extends HTMLElement {
     connectedCallback() {
       this.form = this.querySelector('form');
       this.variantInput = this.querySelector('[data-variant-id]');
-      this.submitBtn = this.querySelector('button[type="submit"]');
-      this.label = this.querySelector('[data-add-label]');
+      this.addBtn = this.querySelector('[data-add-btn]');
+      this.addLabel = this.querySelector('[data-add-label]');
+      this.errorEl = this.querySelector('[data-form-error]');
+      const json = document.querySelector('[data-product-json]');
+      try { this.product = json ? JSON.parse(json.textContent) : null; } catch (e) { this.product = null; }
 
-      const dataEl = document.querySelector('[data-product-json]');
-      try {
-        this.product = dataEl ? JSON.parse(dataEl.textContent) : null;
-      } catch (e) {
-        this.product = null;
-      }
+      this.querySelectorAll('input[type="radio"][name^="options"]').forEach((r) =>
+        r.addEventListener('change', () => this.onOptionChange()));
 
-      // Variant sync via option radios
-      this.querySelectorAll('input[type="radio"][name^="options"]').forEach(radio => {
-        radio.addEventListener('change', () => this.handleOptionChange());
-      });
+      const qIn = this.querySelector('[data-qty-input]');
+      this.querySelector('[data-qty-up]')?.addEventListener('click', () => { qIn.value = (parseInt(qIn.value, 10) || 1) + 1; });
+      this.querySelector('[data-qty-down]')?.addEventListener('click', () => { qIn.value = Math.max(1, (parseInt(qIn.value, 10) || 1) - 1); });
 
-      if (this.form) {
-        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-      }
+      if (this.form) this.form.addEventListener('submit', (e) => this.onSubmit(e));
     }
-
     selectedOptions() {
-      const selected = [];
-      this.querySelectorAll('fieldset[data-option-index]').forEach(set => {
-        const checked = set.querySelector('input[type="radio"]:checked');
-        if (checked) selected.push(checked.value);
+      const sel = [];
+      this.querySelectorAll('fieldset[data-option-index]').forEach((fs) => {
+        const checked = fs.querySelector('input[type="radio"]:checked');
+        if (checked) sel.push(checked.value);
       });
-      return selected;
+      return sel;
     }
-
-    handleOptionChange() {
+    onOptionChange() {
+      // update each fieldset legend label
+      this.querySelectorAll('fieldset[data-option-index]').forEach((fs) => {
+        const checked = fs.querySelector('input[type="radio"]:checked');
+        const strong = fs.querySelector('[data-opt-selected]');
+        if (checked && strong) strong.textContent = checked.value;
+      });
       if (!this.product) return;
       const chosen = this.selectedOptions();
-      const match = this.product.variants.find(v =>
-        v.options.length === chosen.length &&
-        v.options.every((opt, i) => opt === chosen[i])
-      );
+      const match = this.product.variants.find((v) =>
+        v.options.length === chosen.length && v.options.every((o, i) => o === chosen[i]));
       if (!match) return;
-
       this.variantInput.value = match.id;
 
-      if (this.label) {
-        if (match.available) {
-          this.label.textContent = 'Add to cart';
-          this.submitBtn.removeAttribute('disabled');
-        } else {
-          this.label.textContent = 'Sold out';
-          this.submitBtn.setAttribute('disabled', '');
-        }
+      const priceEl = document.querySelector('[data-pdp-price]');
+      if (priceEl) {
+        const sale = match.compare_at_price && match.compare_at_price > match.price;
+        priceEl.innerHTML = `<span class="price${sale ? ' price--sale' : ''}">
+          <span class="price-now">${money(match.price)}</span>
+          ${sale ? `<s class="price-was">${money(match.compare_at_price)}</s>` : ''}</span>`;
       }
-
-      // Update URL for sharing
+      if (this.addLabel) {
+        this.addLabel.textContent = match.available ? 'Add to cart' : 'Sold out';
+        this.addBtn.disabled = !match.available;
+      }
+      if (match.featured_image) {
+        const main = document.querySelector('[data-pdp-main]');
+        if (main) main.src = match.featured_image.replace(/(\.[a-z]+)(\?|$)/i, '_1400x$1$2');
+      }
       if (history.replaceState) {
         const url = new URL(window.location);
         url.searchParams.set('variant', match.id);
         history.replaceState({}, '', url);
       }
-
-      this.dispatchEvent(new CustomEvent('variant:change', { detail: { variant: match }, bubbles: true }));
     }
-
-    async handleSubmit(e) {
+    async onSubmit(e) {
       e.preventDefault();
-      if (!this.submitBtn || this.submitBtn.disabled) return;
-
-      this.submitBtn.setAttribute('disabled', '');
-      const original = this.label ? this.label.textContent : '';
-      if (this.label) this.label.textContent = 'Adding…';
-
+      if (this.addBtn.disabled) return;
+      const original = this.addLabel ? this.addLabel.textContent : '';
+      this.addBtn.disabled = true;
+      if (this.addLabel) this.addLabel.textContent = 'Adding…';
+      if (this.errorEl) this.errorEl.hidden = true;
       try {
-        const formData = new FormData(this.form);
-        const res = await fetch(window.Shopify?.routes?.root ? `${Shopify.routes.root}cart/add.js` : '/cart/add.js', {
-          method: 'POST',
-          headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-          body: formData
+        const res = await fetch(`${window.Shopify?.routes?.root || '/'}cart/add.js`, {
+          method: 'POST', headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          body: new FormData(this.form)
         });
-        if (!res.ok) throw new Error('Add to cart failed');
-        await res.json();
-
-        if (this.label) this.label.textContent = 'Added ✓';
-
-        const drawer = document.getElementById('CartDrawer');
-        if (drawer && window.matchMedia('(min-width: 750px)').matches) {
-          await drawer.refresh();
-          drawer.open();
-        } else {
-          // On mobile, just refresh count
-          await refreshCartCount();
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.description || 'Could not add to cart');
         }
-
-        setTimeout(() => {
-          if (this.label) this.label.textContent = original;
-          this.submitBtn.removeAttribute('disabled');
-        }, 1200);
+        if (this.addLabel) this.addLabel.textContent = 'Added ✓';
+        openDrawerAfterAdd();
+        setTimeout(() => { if (this.addLabel) this.addLabel.textContent = original; this.addBtn.disabled = false; }, 1200);
       } catch (err) {
-        console.error(err);
-        if (this.label) this.label.textContent = 'Try again';
-        this.submitBtn.removeAttribute('disabled');
+        if (this.errorEl) { this.errorEl.textContent = err.message; this.errorEl.hidden = false; }
+        if (this.addLabel) this.addLabel.textContent = original;
+        this.addBtn.disabled = false;
       }
     }
   }
   customElements.define('product-form', ProductForm);
 
-  /* ----------------------------------------
-     <cart-drawer> — overlay slide-in cart
-     ---------------------------------------- */
-  class CartDrawer extends HTMLElement {
-    constructor() {
-      super();
-      this._opened = false;
-    }
-
-    connectedCallback() {
-      this.removeAttribute('hidden');
-      this.style.visibility = 'hidden';
-      this.refresh();
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && this._opened) this.close();
+  /* ---------- PDP gallery + tabs ---------- */
+  function initGallery() {
+    const main = document.querySelector('[data-pdp-main]');
+    if (!main) return;
+    document.querySelectorAll('[data-pdp-thumb]').forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        main.src = thumb.dataset.full;
+        main.removeAttribute('srcset');
+        document.querySelectorAll('[data-pdp-thumb]').forEach((t) => t.classList.remove('is-active'));
+        thumb.classList.add('is-active');
       });
-    }
-
-    async refresh() {
-      try {
-        const res = await fetch('/cart.js', { headers: { 'Accept': 'application/json' } });
-        const cart = await res.json();
-        this.render(cart);
-        updateCartCountUI(cart.item_count);
-      } catch (e) {
-        console.warn('Cart fetch failed', e);
-      }
-    }
-
-    render(cart) {
-      const items = cart.items.map(item => `
-        <li class="drawer-item">
-          <a href="${item.url}" class="drawer-item__media">
-            ${item.image ? `<img src="${item.image}" alt="" width="80" height="80" loading="lazy">` : ''}
-          </a>
-          <div class="drawer-item__detail">
-            <a href="${item.url}" class="drawer-item__name">${escapeHTML(item.product_title)}</a>
-            ${item.variant_title && item.variant_title !== 'Default Title' ? `<small>${escapeHTML(item.variant_title)}</small>` : ''}
-            <div class="drawer-item__row">
-              <span class="drawer-item__qty">Qty ${item.quantity}</span>
-              <span class="drawer-item__price">${formatMoney(item.final_line_price)}</span>
-            </div>
-            <button type="button" class="drawer-item__remove" data-remove-key="${item.key}">Remove</button>
-          </div>
-        </li>
-      `).join('');
-
-      this.innerHTML = `
-        <div class="drawer__overlay" data-close></div>
-        <aside class="drawer__panel" role="dialog" aria-label="Cart">
-          <header class="drawer__head">
-            <h2 class="drawer__title">Cart · ${cart.item_count}</h2>
-            <button type="button" class="drawer__close" data-close aria-label="Close">×</button>
-          </header>
-          <div class="drawer__body">
-            ${cart.items.length === 0
-              ? `<p class="drawer__empty">Your cart is empty.</p>`
-              : `<ul class="drawer__items">${items}</ul>`}
-          </div>
-          <footer class="drawer__foot">
-            <div class="drawer__total">
-              <span>Subtotal</span>
-              <strong>${formatMoney(cart.total_price)}</strong>
-            </div>
-            <a href="/checkout" class="btn btn--solid btn--lg drawer__checkout"${cart.items.length === 0 ? ' aria-disabled="true" style="pointer-events:none;opacity:.4;"' : ''}>Checkout</a>
-            <a href="/cart" class="drawer__view-cart">View full cart →</a>
-          </footer>
-        </aside>
-      `;
-
-      this.style.visibility = 'visible';
-
-      this.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => this.close()));
-      this.querySelectorAll('[data-remove-key]').forEach(el => {
-        el.addEventListener('click', () => this.removeItem(el.dataset.removeKey));
-      });
-    }
-
-    async removeItem(key) {
-      try {
-        await fetch('/cart/change.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ id: key, quantity: 0 })
-        });
-        this.refresh();
-      } catch (e) { console.warn(e); }
-    }
-
-    open() {
-      this._opened = true;
-      this.setAttribute('open', '');
-      document.body.style.overflow = 'hidden';
-    }
-
-    close() {
-      this._opened = false;
-      this.removeAttribute('open');
-      document.body.style.overflow = '';
-    }
+    });
   }
-  customElements.define('cart-drawer', CartDrawer);
+  function initTabs() {
+    document.querySelectorAll('[data-tabs]').forEach((tabs) => {
+      const heads = tabs.querySelectorAll('[data-tab]');
+      heads.forEach((head) => head.addEventListener('click', () => {
+        heads.forEach((h) => h.classList.remove('is-on'));
+        head.classList.add('is-on');
+        tabs.querySelectorAll('[data-tab-panel]').forEach((p) => {
+          p.hidden = p.dataset.tabPanel !== head.dataset.tab;
+        });
+      }));
+    });
+  }
 
-  /* ----------------------------------------
-     <quick-view> — fetch product, render modal,
-     async add to cart without leaving the page
-     ---------------------------------------- */
-  class QuickView extends HTMLElement {
-    constructor() {
-      super();
-      this._opened = false;
-      this._cache = new Map();
+  /* ---------- cart page qty / remove ---------- */
+  function initCartPage() {
+    const form = document.getElementById('cart-form');
+    if (!form) return;
+    const change = (key, qty) => fetch(`${window.Shopify?.routes?.root || '/'}cart/change.js`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ id: key, quantity: qty })
+    }).then(() => window.location.reload());
+
+    form.addEventListener('click', (e) => {
+      const up = e.target.closest('[data-cart-qty-up]');
+      const down = e.target.closest('[data-cart-qty-down]');
+      const rm = e.target.closest('[data-cart-remove]');
+      if (!up && !down && !rm) return;
+      e.preventDefault();
+      if (rm) return void change(rm.dataset.cartRemove, 0);
+      const key = (up || down).dataset.key;
+      const input = form.querySelector(`input[data-key="${key}"]`);
+      let n = parseInt(input ? input.value : '1', 10) || 1;
+      n += up ? 1 : -1;
+      change(key, Math.max(0, n));
+    });
+    form.addEventListener('change', (e) => {
+      const input = e.target.closest('input[data-key]');
+      if (input) change(input.dataset.key, Math.max(0, parseInt(input.value, 10) || 0));
+    });
+  }
+
+  /* ---------- collection filters ---------- */
+  function initFilters() {
+    const form = document.querySelector('[data-facet-form]');
+    if (!form) return;
+    const toggle = document.querySelector('[data-filter-toggle]');
+    const layout = document.querySelector('[data-col-layout]');
+    const filters = document.querySelector('[data-filters]');
+    const grid = form.querySelector('.pgrid');
+
+    if (toggle && filters && layout) {
+      const open = () => {
+        filters.hidden = false;
+        layout.classList.add('with-filters');
+        grid && grid.classList.replace('pgrid-4', 'pgrid-3');
+        toggle.setAttribute('aria-expanded', 'true');
+      };
+      const close = () => {
+        filters.hidden = true;
+        layout.classList.remove('with-filters');
+        grid && grid.classList.replace('pgrid-3', 'pgrid-4');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
+      // open by default on desktop
+      if (isDesktop()) open();
+      toggle.addEventListener('click', () => {
+        toggle.getAttribute('aria-expanded') === 'true' ? close() : open();
+      });
     }
+    form.querySelectorAll('[data-auto-submit]').forEach((el) => {
+      const evt = el.tagName === 'SELECT' || el.type === 'checkbox' ? 'change' : 'change';
+      el.addEventListener(evt, () => form.submit());
+    });
+  }
 
+  /* ---------- quick view ---------- */
+  class QuickView extends HTMLElement {
     connectedCallback() {
       this.removeAttribute('hidden');
-      this.style.visibility = 'hidden';
-
+      this.classList.add('qv');
       document.addEventListener('click', (e) => {
-        const trigger = e.target.closest('[data-quick-view]');
-        if (trigger) {
-          e.preventDefault();
-          const handle = trigger.dataset.productHandle;
-          if (handle) this.openHandle(handle);
-        }
+        const t = e.target.closest('[data-quick-view]');
+        if (t) { e.preventDefault(); e.stopPropagation(); this.load(t.dataset.productHandle); }
       });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && this._opened) this.close();
-      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && this._open) this.close(); });
     }
-
-    async openHandle(handle) {
-      this.renderLoading();
+    open() { this._open = true; this.classList.add('is-on'); lockScroll(true); }
+    close() { this._open = false; this.classList.remove('is-on'); lockScroll(false); }
+    async load(handle) {
+      this.innerHTML = `<div class="qv-scrim" data-qv-close></div><div class="qv-panel"><p class="qv-loading">Loading…</p></div>`;
+      this.bindClose();
       this.open();
-
-      let product = this._cache.get(handle);
-      if (!product) {
-        try {
-          const res = await fetch(`/products/${handle}.js`, { headers: { 'Accept': 'application/json' } });
-          if (!res.ok) throw new Error('Product fetch failed');
-          product = await res.json();
-          this._cache.set(handle, product);
-        } catch (e) {
-          this.renderError();
-          return;
-        }
+      try {
+        const res = await fetch(`${window.Shopify?.routes?.root || '/'}products/${handle}.js`, { headers: { Accept: 'application/json' } });
+        this.render(await res.json());
+      } catch (e) {
+        this.querySelector('.qv-panel').innerHTML = '<p class="qv-loading">Could not load. Open the full product page.</p>';
       }
-      this.render(product);
     }
-
-    renderLoading() {
-      this.innerHTML = `
-        <div class="qv__overlay" data-close></div>
-        <aside class="qv__panel" role="dialog" aria-label="Quick view" aria-busy="true">
-          <p class="qv__loading">Loading…</p>
-        </aside>`;
-      this.style.visibility = 'visible';
-      this.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => this.close()));
-    }
-
-    renderError() {
-      this.innerHTML = `
-        <div class="qv__overlay" data-close></div>
-        <aside class="qv__panel" role="dialog">
-          <button type="button" class="qv__close" data-close aria-label="Close">×</button>
-          <p class="qv__loading">Something went wrong. Try the full product page.</p>
-        </aside>`;
-      this.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => this.close()));
-    }
-
-    render(product) {
-      const firstAvailable = product.variants.find(v => v.available) || product.variants[0];
-      const optionsHTML = product.options.map((opt, idx) => {
-        const values = [...new Set(product.variants.map(v => v.options[idx]))];
-        const swatches = values.map(v => {
-          const id = `qv-opt-${idx}-${v.replace(/\W+/g, '-')}`;
-          const checked = firstAvailable.options[idx] === v ? 'checked' : '';
-          return `
-            <input type="radio" id="${id}" name="qv-opt-${idx}" value="${escapeHTML(v)}" ${checked}>
-            <label for="${id}" class="product__swatch">${escapeHTML(v)}</label>`;
-        }).join('');
-        return `
-          <fieldset class="product__option" data-option-index="${idx}">
-            <legend class="product__option-name">${escapeHTML(opt)}</legend>
-            <div class="product__option-values">${swatches}</div>
-          </fieldset>`;
+    render(p) {
+      this._product = p;
+      const v = p.variants.find((x) => x.available) || p.variants[0];
+      const img = (p.featured_image || (p.images && p.images[0]) || '');
+      const opts = p.has_only_default_variant ? '' : p.options.map((opt, idx) => {
+        const vals = [...new Set(p.variants.map((x) => x.options[idx]))];
+        return `<fieldset class="pdp-opt" data-option-index="${idx}">
+          <legend>${esc(opt)}</legend>
+          <div class="pdp-swatches">${vals.map((val, j) => {
+            const id = `qv-${idx}-${j}`;
+            return `<input type="radio" class="visually-hidden" id="${id}" name="qv-opt-${idx}" value="${esc(val)}" ${v.options[idx] === val ? 'checked' : ''}>
+              <label for="${id}" class="swatch">${esc(val)}</label>`;
+          }).join('')}</div></fieldset>`;
       }).join('');
 
-      const img = product.featured_image || (product.images && product.images[0]);
-
       this.innerHTML = `
-        <div class="qv__overlay" data-close></div>
-        <aside class="qv__panel" role="dialog" aria-label="${escapeHTML(product.title)}">
-          <button type="button" class="qv__close" data-close aria-label="Close">×</button>
-          <div class="qv__layout">
-            <div class="qv__media">
-              ${img ? `<img src="${img}" alt="${escapeHTML(product.title)}" width="600" height="750">` : ''}
-            </div>
-            <div class="qv__info">
-              ${product.vendor ? `<p class="product__vendor">${escapeHTML(product.vendor)}</p>` : ''}
-              <h2 class="qv__title">${escapeHTML(product.title)}</h2>
-              <p class="qv__price" data-qv-price>${formatMoney(firstAvailable.price)}</p>
-
-              <form class="qv__form" data-qv-form>
-                <input type="hidden" name="id" value="${firstAvailable.id}" data-qv-variant>
-                ${product.has_only_default_variant ? '' : `<div class="product__options">${optionsHTML}</div>`}
-                <div class="product__buy">
-                  <label class="product__qty">
-                    <span class="visually-hidden">Quantity</span>
-                    <input type="number" name="quantity" value="1" min="1" inputmode="numeric">
-                  </label>
-                  <button type="submit" class="btn btn--solid btn--lg" data-qv-add>
-                    <span data-qv-add-label>${firstAvailable.available ? 'Add to cart' : 'Sold out'}</span>
-                  </button>
+        <div class="qv-scrim" data-qv-close></div>
+        <div class="qv-panel">
+          <button type="button" class="qv-close" data-qv-close aria-label="Close">✕</button>
+          <div class="qv-media">${img ? `<img src="${img}" alt="${esc(p.title)}">` : ''}</div>
+          <div class="qv-info">
+            ${p.vendor ? `<p class="pdp-vendor">${esc(p.vendor)}</p>` : ''}
+            <h2 class="pdp-title" style="font-size:clamp(1.6rem,3vw,2.4rem)">${esc(p.title)}</h2>
+            <div class="pdp-price" data-qv-price>${money(v.price)}</div>
+            <form data-qv-form>
+              <input type="hidden" name="id" value="${v.id}" data-qv-id>
+              ${opts}
+              <div class="pdp-buy" style="margin-top:8px">
+                <div class="qty">
+                  <button type="button" data-qv-down aria-label="Decrease">−</button>
+                  <input type="number" name="quantity" value="1" min="1" data-qv-qty>
+                  <button type="button" data-qv-up aria-label="Increase">+</button>
                 </div>
-              </form>
-
-              <a href="/products/${product.handle}" class="qv__view-full">View full details →</a>
-            </div>
+                <button type="submit" class="btn btn-fill btn-block" data-qv-add>
+                  <span data-qv-add-label>${v.available ? 'Add to cart' : 'Sold out'}</span>
+                </button>
+              </div>
+            </form>
+            <a href="/products/${p.handle}" class="link-btn" style="color:var(--ash);margin-top:12px;display:inline-block">View full details →</a>
           </div>
-        </aside>`;
-
-      this._product = product;
+        </div>`;
+      this.bindClose();
       this.bindForm();
     }
-
+    bindClose() {
+      this.querySelectorAll('[data-qv-close]').forEach((b) => b.addEventListener('click', () => this.close()));
+    }
     bindForm() {
-      this.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => this.close()));
-      this.querySelectorAll('input[type="radio"][name^="qv-opt"]').forEach(r => {
-        r.addEventListener('change', () => this.syncVariant());
+      const qty = this.querySelector('[data-qv-qty]');
+      this.querySelector('[data-qv-up]')?.addEventListener('click', () => { qty.value = (parseInt(qty.value, 10) || 1) + 1; });
+      this.querySelector('[data-qv-down]')?.addEventListener('click', () => { qty.value = Math.max(1, (parseInt(qty.value, 10) || 1) - 1); });
+      this.querySelectorAll('input[name^="qv-opt"]').forEach((r) => r.addEventListener('change', () => this.sync()));
+      this.querySelector('[data-qv-form]')?.addEventListener('submit', (e) => this.add(e));
+    }
+    sync() {
+      const chosen = [];
+      this.querySelectorAll('fieldset[data-option-index]').forEach((fs) => {
+        const c = fs.querySelector('input:checked'); if (c) chosen.push(c.value);
       });
-      const form = this.querySelector('[data-qv-form]');
-      if (form) form.addEventListener('submit', (e) => this.handleAdd(e));
+      const m = this._product.variants.find((v) => v.options.every((o, i) => o === chosen[i]));
+      if (!m) return;
+      this.querySelector('[data-qv-id]').value = m.id;
+      this.querySelector('[data-qv-price]').textContent = money(m.price);
+      const lbl = this.querySelector('[data-qv-add-label]');
+      if (lbl) lbl.textContent = m.available ? 'Add to cart' : 'Sold out';
     }
-
-    selectedOptions() {
-      const selected = [];
-      this.querySelectorAll('fieldset[data-option-index]').forEach(set => {
-        const checked = set.querySelector('input[type="radio"]:checked');
-        if (checked) selected.push(checked.value);
-      });
-      return selected;
-    }
-
-    syncVariant() {
-      const chosen = this.selectedOptions();
-      const match = this._product.variants.find(v =>
-        v.options.length === chosen.length &&
-        v.options.every((opt, i) => opt === chosen[i])
-      );
-      if (!match) return;
-      const variantInput = this.querySelector('[data-qv-variant]');
-      const priceEl = this.querySelector('[data-qv-price]');
-      const label = this.querySelector('[data-qv-add-label]');
-      const addBtn = this.querySelector('[data-qv-add]');
-      if (variantInput) variantInput.value = match.id;
-      if (priceEl) priceEl.textContent = formatMoney(match.price);
-      if (label && addBtn) {
-        if (match.available) {
-          label.textContent = 'Add to cart';
-          addBtn.removeAttribute('disabled');
-        } else {
-          label.textContent = 'Sold out';
-          addBtn.setAttribute('disabled', '');
-        }
-      }
-    }
-
-    async handleAdd(e) {
+    async add(e) {
       e.preventDefault();
-      const form = e.target;
-      const addBtn = form.querySelector('[data-qv-add]');
-      const label = form.querySelector('[data-qv-add-label]');
-      if (!addBtn || addBtn.disabled) return;
-
-      addBtn.setAttribute('disabled', '');
-      const original = label ? label.textContent : '';
-      if (label) label.textContent = 'Adding…';
-
+      const btn = this.querySelector('[data-qv-add]');
+      const lbl = this.querySelector('[data-qv-add-label]');
+      btn.disabled = true; const orig = lbl.textContent; lbl.textContent = 'Adding…';
       try {
-        const res = await fetch('/cart/add.js', {
-          method: 'POST',
-          headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-          body: new FormData(form)
+        const res = await fetch(`${window.Shopify?.routes?.root || '/'}cart/add.js`, {
+          method: 'POST', headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+          body: new FormData(e.target)
         });
         if (!res.ok) throw new Error('add failed');
-        await res.json();
-
-        if (label) label.textContent = 'Added ✓';
-        const drawer = document.getElementById('CartDrawer');
-        if (drawer) {
-          await drawer.refresh();
-          this.close();
-          if (window.matchMedia('(min-width: 750px)').matches) drawer.open();
-        } else {
-          await refreshCartCount();
-        }
-        setTimeout(() => {
-          if (label) label.textContent = original;
-          addBtn.removeAttribute('disabled');
-        }, 1000);
+        lbl.textContent = 'Added ✓';
+        this.close();
+        openDrawerAfterAdd();
       } catch (err) {
-        console.error(err);
-        if (label) label.textContent = 'Try again';
-        addBtn.removeAttribute('disabled');
+        lbl.textContent = orig; btn.disabled = false;
       }
-    }
-
-    open() {
-      this._opened = true;
-      this.setAttribute('open', '');
-      document.body.style.overflow = 'hidden';
-    }
-
-    close() {
-      this._opened = false;
-      this.removeAttribute('open');
-      document.body.style.overflow = '';
     }
   }
   customElements.define('quick-view', QuickView);
 
-  /* ----------------------------------------
-     <predictive-search> — header dropdown that
-     queries /search/suggest.json
-     ---------------------------------------- */
-  class PredictiveSearch extends HTMLElement {
-    connectedCallback() {
-      this.input = this.querySelector('[data-predictive-input]');
-      this.results = this.querySelector('[data-predictive-results]');
-      this.toggle = document.querySelector('[data-search-toggle]');
-      this.closeBtn = this.querySelector('[data-search-close]');
-
-      if (this.toggle) this.toggle.addEventListener('click', () => this.toggleOpen());
-      if (this.closeBtn) this.closeBtn.addEventListener('click', () => this.close());
-
-      let timer;
-      if (this.input) {
-        this.input.addEventListener('input', () => {
-          clearTimeout(timer);
-          const q = this.input.value.trim();
-          if (q.length < 2) { this.results.hidden = true; this.results.innerHTML = ''; return; }
-          timer = setTimeout(() => this.query(q), 200);
-        });
-      }
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !this.hasAttribute('hidden')) this.close();
-      });
-    }
-
-    toggleOpen() {
-      if (this.hasAttribute('hidden')) this.open(); else this.close();
-    }
-
-    open() {
-      this.removeAttribute('hidden');
-      if (this.toggle) this.toggle.setAttribute('aria-expanded', 'true');
-      setTimeout(() => this.input && this.input.focus(), 50);
-    }
-
-    close() {
-      this.setAttribute('hidden', '');
-      if (this.toggle) this.toggle.setAttribute('aria-expanded', 'false');
-      if (this.results) { this.results.hidden = true; this.results.innerHTML = ''; }
-      if (this.input) this.input.value = '';
-    }
-
-    async query(q) {
-      try {
-        const url = `/search/suggest.json?q=${encodeURIComponent(q)}&resources[type]=product,collection&resources[limit]=6`;
-        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        const data = await res.json();
-        this.renderResults(data.resources.results, q);
-      } catch (e) {
-        console.warn('Predictive search failed', e);
-      }
-    }
-
-    renderResults(results, q) {
-      const products = (results.products || []).map(p => `
-        <a href="${p.url}" class="ps-result">
-          ${p.image ? `<img src="${p.image}" alt="" width="48" height="48" loading="lazy">` : '<span class="ps-result__placeholder"></span>'}
-          <span class="ps-result__detail">
-            <span class="ps-result__name">${escapeHTML(p.title)}</span>
-            <span class="ps-result__price">${p.price}</span>
-          </span>
-        </a>`).join('');
-
-      const collections = (results.collections || []).map(c => `
-        <a href="${c.url}" class="ps-collection">${escapeHTML(c.title)}</a>`).join('');
-
-      const empty = !products && !collections;
-
-      this.results.innerHTML = `
-        ${empty ? `<p class="ps-empty">No matches for &ldquo;${escapeHTML(q)}&rdquo;.</p>` : ''}
-        ${collections ? `<div class="ps-group"><p class="ps-label">Collections</p>${collections}</div>` : ''}
-        ${products ? `<div class="ps-group"><p class="ps-label">Products</p>${products}</div>` : ''}
-        <a href="/search?q=${encodeURIComponent(q)}" class="ps-see-all">See all results for &ldquo;${escapeHTML(q)}&rdquo; →</a>
-      `;
-      this.results.hidden = false;
-    }
-  }
-  customElements.define('predictive-search', PredictiveSearch);
-
-  /* ----------------------------------------
-     <cookies-banner> — bottom-fixed accept/decline
-     persisted via localStorage
-     ---------------------------------------- */
-  class CookiesBanner extends HTMLElement {
-    connectedCallback() {
-      const stored = (() => { try { return localStorage.getItem('sploot:cookies'); } catch (e) { return null; } })();
-      if (stored === 'accepted' || stored === 'declined') return;
-
-      this.removeAttribute('hidden');
-      requestAnimationFrame(() => this.setAttribute('visible', ''));
-
-      this.querySelector('[data-cookies-accept]')?.addEventListener('click', () => this.choose('accepted'));
-      this.querySelector('[data-cookies-decline]')?.addEventListener('click', () => this.choose('declined'));
-    }
-
-    choose(value) {
-      try { localStorage.setItem('sploot:cookies', value); } catch (e) {}
-      this.removeAttribute('visible');
-      setTimeout(() => this.setAttribute('hidden', ''), 240);
-    }
-  }
-  customElements.define('cookies-banner', CookiesBanner);
-
-  /* ----------------------------------------
-     Sticky add-to-cart on mobile (product page)
-     Appears once the main Add to Cart scrolls out.
-     ---------------------------------------- */
-  function initStickyAtc() {
-    const sticky = document.querySelector('[data-sticky-atc]');
-    const mainBtn = document.querySelector('.product__add');
-    const mainForm = document.getElementById('ProductForm');
-    if (!sticky || !mainBtn || !mainForm) return;
-
-    const stickyBtn = sticky.querySelector('[data-sticky-add]');
-    const stickyPrice = sticky.querySelector('[data-sticky-price]');
-
-    // Update price when main variant changes
-    mainForm.addEventListener('variant:change', (e) => {
-      if (stickyPrice && e.detail?.variant) {
-        stickyPrice.textContent = formatMoney(e.detail.variant.price);
-      }
-      if (stickyBtn && e.detail?.variant) {
-        if (e.detail.variant.available) {
-          stickyBtn.textContent = 'Add to cart';
-          stickyBtn.removeAttribute('disabled');
-        } else {
-          stickyBtn.textContent = 'Sold out';
-          stickyBtn.setAttribute('disabled', '');
-        }
-      }
-    });
-
-    // Sticky button just triggers the real form submission
-    stickyBtn?.addEventListener('click', () => {
-      mainForm.requestSubmit ? mainForm.requestSubmit() : mainForm.submit();
-    });
-
-    // Show/hide based on intersection of the main Add to Cart
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) {
-          sticky.removeAttribute('hidden');
-          requestAnimationFrame(() => sticky.setAttribute('visible', ''));
-        } else {
-          sticky.removeAttribute('visible');
-          setTimeout(() => sticky.setAttribute('hidden', ''), 240);
-        }
-      });
-    }, { threshold: 0, rootMargin: '0px 0px -80px 0px' });
-    io.observe(mainBtn);
-  }
-  document.addEventListener('DOMContentLoaded', initStickyAtc);
-
-  /* ----------------------------------------
-     Collection filters — auto-submit, mobile toggle
-     ---------------------------------------- */
-  function initFilters() {
-    const form = document.querySelector('[data-filters-form]');
-    if (!form) return;
-
-    const toggle = document.querySelector('[data-filters-toggle]');
-    const closeBtn = document.querySelector('[data-filters-close]');
-    const aside = document.getElementById('CollectionFilters');
-    const count = document.querySelector('[data-filter-count]');
-
-    function updateCount() {
-      const n = form.querySelectorAll('input[type="checkbox"]:checked').length;
-      if (count) count.textContent = n > 0 ? `(${n})` : '';
-    }
-
-    function openPanel() {
-      aside?.setAttribute('open', '');
-      toggle?.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
-    }
-    function closePanel() {
-      aside?.removeAttribute('open');
-      toggle?.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    }
-
-    toggle?.addEventListener('click', () => {
-      if (aside?.hasAttribute('open')) closePanel(); else openPanel();
-    });
-    closeBtn?.addEventListener('click', closePanel);
-
-    // Auto-submit on desktop only; on mobile wait for Apply button
-    let debounceTimer;
-    form.addEventListener('change', () => {
-      updateCount();
-      if (window.matchMedia('(min-width: 990px)').matches) {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => form.submit(), 300);
-      }
-    });
-
-    updateCount();
-  }
-  document.addEventListener('DOMContentLoaded', initFilters);
-
-  /* ----------------------------------------
-     Helpers
-     ---------------------------------------- */
-  function escapeHTML(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>"']/g, c => ({
-      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-    }[c]));
-  }
-
-  function formatMoney(cents) {
-    return `$${(cents / 100).toFixed(2)}`;
-  }
-
-  function updateCartCountUI(count) {
-    document.querySelectorAll('[data-cart-count]').forEach(el => {
-      el.textContent = count;
-      el.style.display = count > 0 ? '' : 'none';
-    });
-  }
-
-  async function refreshCartCount() {
-    try {
-      const res = await fetch('/cart.js', { headers: { 'Accept': 'application/json' } });
-      const cart = await res.json();
-      updateCartCountUI(cart.item_count);
-    } catch (e) { console.warn(e); }
-  }
-
-  /* ----------------------------------------
-     Init: hide cart count if zero on load
-     ---------------------------------------- */
+  /* ---------- init ---------- */
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-cart-count]').forEach(el => {
-      if (Number(el.textContent.trim()) === 0) el.style.display = 'none';
-    });
+    initGallery();
+    initTabs();
+    initCartPage();
+    initFilters();
   });
-
-  /* ----------------------------------------
-     Drawer styles injected (kept tight here so the
-     drawer markup ships ready to use without users
-     having to edit theme.css).
-     ---------------------------------------- */
-  const drawerCSS = `
-    cart-drawer .drawer__overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.55);
-      opacity: 0; pointer-events: none;
-      transition: opacity 280ms ease;
-    }
-    cart-drawer[open] .drawer__overlay { opacity: 1; pointer-events: auto; }
-    cart-drawer .drawer__panel {
-      position: relative;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-    cart-drawer .drawer__head {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--color-line);
-    }
-    cart-drawer .drawer__title {
-      font-family: var(--font-heading-family);
-      text-transform: uppercase;
-      font-size: 1.1rem;
-      margin: 0;
-      letter-spacing: .05em;
-    }
-    cart-drawer .drawer__close {
-      font-size: 1.8rem;
-      line-height: 1;
-      padding: 4px 8px;
-    }
-    cart-drawer .drawer__body { flex: 1; overflow-y: auto; padding: 16px 24px; }
-    cart-drawer .drawer__items { display: flex; flex-direction: column; gap: 20px; }
-    cart-drawer .drawer-item {
-      display: grid;
-      grid-template-columns: 80px 1fr;
-      gap: 16px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--color-line);
-    }
-    cart-drawer .drawer-item__media { background: #181818; }
-    cart-drawer .drawer-item__media img { width: 80px; height: 80px; object-fit: cover; display: block; }
-    cart-drawer .drawer-item__detail { display: flex; flex-direction: column; gap: 4px; }
-    cart-drawer .drawer-item__name {
-      font-family: var(--font-heading-family);
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: .9rem;
-      letter-spacing: .02em;
-    }
-    cart-drawer .drawer-item small { color: var(--color-muted); font-family: var(--type-mono); font-size: .75rem; }
-    cart-drawer .drawer-item__row {
-      display: flex; justify-content: space-between; align-items: baseline;
-      margin-top: 4px;
-      font-family: var(--type-mono);
-      font-size: .85rem;
-    }
-    cart-drawer .drawer-item__remove {
-      align-self: start;
-      font-family: var(--type-mono);
-      font-size: .7rem;
-      text-transform: uppercase;
-      letter-spacing: .15em;
-      color: var(--color-muted);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      margin-top: 4px;
-    }
-    cart-drawer .drawer-item__remove:hover { color: var(--color-accent); }
-    cart-drawer .drawer__empty { color: var(--color-muted); text-align: center; padding: 64px 0; }
-    cart-drawer .drawer__foot { padding: 20px 24px 28px; border-top: 1px solid var(--color-line); display: flex; flex-direction: column; gap: 12px; }
-    cart-drawer .drawer__total { display: flex; justify-content: space-between; font-family: var(--type-mono); font-size: 1rem; }
-    cart-drawer .drawer__checkout { width: 100%; }
-    cart-drawer .drawer__view-cart {
-      text-align: center;
-      font-family: var(--type-mono);
-      font-size: .75rem;
-      text-transform: uppercase;
-      letter-spacing: .15em;
-      color: var(--color-muted);
-      padding-top: 4px;
-    }
-
-    /* Quick view */
-    quick-view {
-      position: fixed; inset: 0;
-      z-index: 200;
-      display: flex; align-items: center; justify-content: center;
-      visibility: hidden;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 240ms ease;
-    }
-    quick-view[open] { opacity: 1; pointer-events: auto; }
-    quick-view .qv__overlay {
-      position: absolute; inset: 0;
-      background: rgba(0,0,0,.65);
-    }
-    quick-view .qv__panel {
-      position: relative;
-      background: var(--color-bg);
-      color: var(--color-fg);
-      border: 1px solid var(--color-line);
-      width: min(960px, 100% - 32px);
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    quick-view .qv__close {
-      position: absolute; top: 12px; right: 16px;
-      font-size: 1.8rem; line-height: 1;
-      padding: 4px 10px;
-      z-index: 2;
-    }
-    quick-view .qv__layout { display: grid; gap: 0; }
-    @media (min-width: 750px) {
-      quick-view .qv__layout { grid-template-columns: 1fr 1fr; }
-    }
-    quick-view .qv__media { background: #181818; aspect-ratio: 4/5; overflow: hidden; }
-    quick-view .qv__media img { width: 100%; height: 100%; object-fit: cover; }
-    quick-view .qv__info { padding: 32px clamp(20px, 4vw, 40px); display: flex; flex-direction: column; }
-    quick-view .qv__title {
-      font-family: var(--font-heading-family);
-      font-weight: 900;
-      text-transform: uppercase;
-      font-size: var(--size-step-3);
-      line-height: 1;
-      margin: 0 0 12px;
-    }
-    quick-view .qv__price {
-      font-family: var(--type-mono);
-      font-size: 1.1rem;
-      margin: 0 0 24px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--color-line);
-    }
-    quick-view .qv__form { display: flex; flex-direction: column; gap: 24px; }
-    quick-view .qv__view-full {
-      margin-top: 20px;
-      font-family: var(--type-mono);
-      font-size: .8rem;
-      text-transform: uppercase;
-      letter-spacing: .15em;
-      color: var(--color-muted);
-    }
-    quick-view .qv__view-full:hover { color: var(--color-accent); }
-    quick-view .qv__loading { padding: 80px 40px; text-align: center; color: var(--color-muted); }
-
-    /* Predictive search */
-    predictive-search {
-      display: block;
-      border-top: 1px solid var(--color-line);
-      border-bottom: 1px solid var(--color-line);
-      background: var(--color-bg);
-      position: relative;
-      z-index: 60;
-    }
-    predictive-search[hidden] { display: none; }
-    predictive-search .predictive-search__form {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      max-width: var(--container-w);
-      margin: 0 auto;
-      padding: 16px var(--container-gutter);
-    }
-    predictive-search .predictive-search__form input {
-      flex: 1;
-      background: transparent;
-      border: 0;
-      border-bottom: 1.5px solid var(--color-fg);
-      color: var(--color-fg);
-      padding: 12px 0;
-      font-family: var(--type-mono);
-      font-size: 1rem;
-      letter-spacing: .05em;
-    }
-    predictive-search .predictive-search__form input:focus { outline: none; border-color: var(--color-accent); }
-    predictive-search .predictive-search__close {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px; height: 40px;
-    }
-    predictive-search .predictive-search__close:hover { color: var(--color-accent); }
-    predictive-search .predictive-search__results {
-      max-width: var(--container-w);
-      margin: 0 auto;
-      padding: 0 var(--container-gutter) 24px;
-      display: grid;
-      gap: 24px;
-    }
-    @media (min-width: 750px) {
-      predictive-search .predictive-search__results { grid-template-columns: 1fr 2fr auto; align-items: start; }
-    }
-    predictive-search .ps-empty { color: var(--color-muted); grid-column: 1 / -1; padding: 20px 0; }
-    predictive-search .ps-label {
-      font-family: var(--type-mono);
-      text-transform: uppercase;
-      letter-spacing: .2em;
-      font-size: .7rem;
-      color: var(--color-muted);
-      margin: 0 0 12px;
-    }
-    predictive-search .ps-collection {
-      display: block;
-      padding: 10px 0;
-      font-family: var(--font-heading-family);
-      font-weight: 700;
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--color-line);
-    }
-    predictive-search .ps-collection:hover { color: var(--color-accent); }
-    predictive-search .ps-result {
-      display: grid;
-      grid-template-columns: 48px 1fr;
-      gap: 12px;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--color-line);
-    }
-    predictive-search .ps-result:hover { color: var(--color-accent); }
-    predictive-search .ps-result img { width: 48px; height: 48px; object-fit: cover; }
-    predictive-search .ps-result__placeholder { width: 48px; height: 48px; background: #181818; display: block; }
-    predictive-search .ps-result__detail { display: flex; flex-direction: column; gap: 2px; }
-    predictive-search .ps-result__name { font-weight: 600; }
-    predictive-search .ps-result__price { font-family: var(--type-mono); font-size: .8rem; color: var(--color-muted); }
-    predictive-search .ps-see-all {
-      align-self: end;
-      font-family: var(--type-mono);
-      text-transform: uppercase;
-      letter-spacing: .15em;
-      font-size: .8rem;
-      border-bottom: 1px solid currentColor;
-      padding-bottom: 2px;
-    }
-    predictive-search .ps-see-all:hover { color: var(--color-accent); }
-  `;
-  const style = document.createElement('style');
-  style.textContent = drawerCSS;
-  document.head.appendChild(style);
 })();

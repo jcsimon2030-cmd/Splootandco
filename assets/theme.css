@@ -441,7 +441,7 @@ body{background:var(--ink);color:var(--bone);font-family:var(--f-sans);font-size
 .pdp-form-error{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--blood);margin:8px 0 0}
 
 /* --- Cart drawer + quick view (web components) --- */
-cart-drawer,quick-view,mobile-menu{display:block}
+site-header,cart-drawer,quick-view,product-form{display:block}
 .qv{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 220ms ease}
 .qv.is-on{opacity:1;pointer-events:auto}
 .qv-scrim{position:absolute;inset:0;background:rgba(0,0,0,.7)}
@@ -458,4 +458,79 @@ cart-drawer,quick-view,mobile-menu{display:block}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
   .marquee-track,.loaves-ticker-track{animation:none!important}
 }
+
+/* --- Price --- */
+.price{display:inline-flex;gap:8px;align-items:baseline;font-family:var(--f-mono);font-size:.95rem}
+.price-from{color:var(--ash);font-size:.8em}
+.price--sale .price-now{color:var(--blood)}
+.price-was{color:var(--ash);text-decoration:line-through;font-size:.9em}
+
+/* --- PDP variant radios --- */
+.pdp-swatches input,.pdp-sizes input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.pdp-swatches input:checked + label,.pdp-sizes input:checked + label{background:var(--bone);color:var(--ink);border-color:var(--bone)}
+.pdp-swatches input:focus-visible + label,.pdp-sizes input:focus-visible + label{outline:2px solid var(--blood);outline-offset:2px}
+.qty input::-webkit-outer-spin-button,.qty input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.qty input{-moz-appearance:textfield}
+
+/* --- Crest spin --- */
+@keyframes crest-spin{to{transform:rotate(360deg)}}
+.hero-crest .crest-svg{animation:crest-spin 60s linear infinite}
+
+/* --- Media frames --- */
+.placeholder-svg{width:100%;height:100%}
+.cart-row-media,.cart-line-media{display:block;overflow:hidden}
+
+/* --- Legacy button aliases --- */
+.btn--solid{background:var(--bone);color:var(--ink);border-color:var(--bone)}
+.btn--solid:hover{background:var(--blood);color:var(--bone);border-color:var(--blood)}
+.btn--outline{color:var(--bone)}
+.btn--outline:hover{background:var(--bone);color:var(--ink)}
+.btn--lg{padding-block:20px;font-size:14px;width:100%}
+
+/* --- Narrow container --- */
+.container--narrow{max-width:860px}
+
+/* --- FAQ page --- */
+.faq{padding-block:clamp(56px,7vw,110px)}
+.faq__head{border-bottom:1px solid var(--line);padding-bottom:32px;margin-bottom:40px}
+.faq__eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--blood);margin:0 0 12px}
+.faq__title{font-family:var(--f-display);font-weight:900;font-size:clamp(2.6rem,6vw,4.5rem);text-transform:uppercase;letter-spacing:-.025em;line-height:.9;margin:0}
+.faq__intro{color:var(--ash);margin-top:16px}
+.faq__group{font-family:var(--f-display);font-weight:900;text-transform:uppercase;font-size:1rem;letter-spacing:.05em;color:var(--ash);margin:40px 0 8px}
+.faq__item{border-bottom:1px solid var(--line)}
+.faq__item summary{display:flex;justify-content:space-between;gap:24px;align-items:center;cursor:pointer;list-style:none;padding:20px 0;font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:15px;letter-spacing:-.005em}
+.faq__item summary::-webkit-details-marker{display:none}
+.faq__plus{font-family:var(--f-mono);color:var(--blood);transition:transform .2s ease}
+.faq__item[open] .faq__plus{transform:rotate(45deg)}
+.faq__answer{color:var(--ash);padding:0 0 24px;max-width:64ch}
+.faq__contact{margin-top:48px;padding:28px 32px;border:1px solid var(--line);background:var(--soot);display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.faq__contact p{margin:0;font-family:var(--f-display);font-weight:800;text-transform:uppercase}
+.faq__page-body{margin-top:32px}
+
+/* --- Shipping page --- */
+.shipping-page{padding-block:clamp(56px,7vw,110px)}
+.shipping-page__head{border-bottom:1px solid var(--line);padding-bottom:32px;margin-bottom:40px}
+.shipping-page__eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--blood);margin:0 0 12px}
+.shipping-page__title{font-family:var(--f-display);font-weight:900;font-size:clamp(2.6rem,6vw,4.5rem);text-transform:uppercase;letter-spacing:-.025em;line-height:.9;margin:0}
+.shipping-page__intro{color:var(--ash);margin-top:16px}
+.shipping-page__sub{font-family:var(--f-display);font-weight:900;text-transform:uppercase;font-size:1.3rem;margin:48px 0 16px;letter-spacing:-.01em}
+.voyage{display:grid;gap:4px;grid-template-columns:1fr;margin:0;padding:0}
+@media(min-width:750px){.voyage{grid-template-columns:repeat(3,1fr)}}
+.voyage__step{border:1px solid var(--line);background:var(--soot);padding:32px;list-style:none}
+.voyage__num{font-family:var(--f-mono);color:var(--blood);font-size:12px;letter-spacing:.2em}
+.voyage__heading{font-family:var(--f-display);font-weight:900;text-transform:uppercase;font-size:1.1rem;margin:12px 0 8px}
+.voyage__body{color:var(--ash);margin:0;font-size:14px}
+.ship-table-wrap{margin-top:8px;overflow-x:auto}
+.ship-table{width:100%;border-collapse:collapse;font-size:14px}
+.ship-table th,.ship-table td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--line)}
+.ship-table th{font-family:var(--f-mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ash)}
+.ship-table__region{font-family:var(--f-display);font-weight:800;text-transform:uppercase}
+.ship-table__note{color:var(--ash);font-size:13px;margin-top:12px}
+.carriers{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:32px;font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.carriers__label{color:var(--ash)}
+.shipping-page__policies{margin-top:48px}
+.shipping-page__body{margin-top:32px}
+
+/* --- Empty state --- */
+.empty{color:var(--ash);padding:48px 0}
 

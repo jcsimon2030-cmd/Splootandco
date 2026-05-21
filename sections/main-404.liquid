@@ -1,14 +1,12 @@
-<section class="not-found" data-section-id="{{ section.id }}">
-  <div class="container container--narrow not-found__inner">
-    <p class="not-found__code">404</p>
-    <h1 class="not-found__title">{{ 'general.404.title' | t }}</h1>
-    <p class="not-found__sub">{{ 'general.404.subtitle' | t }}</p>
-    <a href="{{ routes.collections_url }}" class="btn btn--solid">{{ 'general.404.link' | t }}</a>
+<main class="notfound" data-section-id="{{ section.id }}">
+  <div class="container">
+    <p class="notfound-code">404</p>
+    <h1 class="notfound-h">{{ 'general.404.title' | t }}</h1>
+    <p class="notfound-p">{{ 'general.404.subtitle' | t }}</p>
+    <a href="{{ routes.root_url }}" class="btn btn-fill">{{ 'general.404.link' | t }}</a>
   </div>
-</section>
+</main>
 
 {% schema %}
-{
-  "name": "404"
-}
+{ "name": "404" }
 {% endschema %}

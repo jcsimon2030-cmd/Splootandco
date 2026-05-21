@@ -1,14 +1,18 @@
-<article class="page" data-section-id="{{ section.id }}">
-  <div class="container container--narrow">
-    <header class="page__head">
-      <h1 class="page__title">{{ page.title }}</h1>
+<main class="page" data-section-id="{{ section.id }}">
+  <div class="container">
+    <header class="page-head">
+      {%- if section.settings.eyebrow != blank -%}<p class="eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h1 class="page-title">{{ page.title }}</h1>
     </header>
-    <div class="page__body rte">{{ page.content }}</div>
+    <div class="rte">{{ page.content }}</div>
   </div>
-</article>
+</main>
 
 {% schema %}
 {
-  "name": "Page"
+  "name": "Page",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "SPLOOT & CO" }
+  ]
 }
 {% endschema %}

@@ -1,34 +1,44 @@
-<section class="search" data-section-id="{{ section.id }}">
+<main class="search-page" data-section-id="{{ section.id }}">
   <div class="container">
-    <header class="section-head">
-      <p class="section-head__eyebrow">{{ 'general.search.title' | t }}</p>
-      <h1 class="section-head__title">{{ search.terms | default: 'Find your armor' }}</h1>
+    <header class="page-head">
+      <p class="eyebrow">SEARCH THE ARMORY</p>
+      <h1 class="page-title">{% if search.terms != blank %}“{{ search.terms }}”{% else %}Search{% endif %}</h1>
     </header>
 
-    <form action="{{ routes.search_url }}" method="get" class="search__form">
-      <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'general.search.placeholder' | t }}">
-      <button type="submit" class="btn btn--solid">Search</button>
+    <form action="{{ routes.search_url }}" method="get" class="search-form" role="search">
+      <input type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'general.search.placeholder' | t }}" aria-label="{{ 'general.search.placeholder' | t }}">
+      <button type="submit" class="btn btn-fill">Search</button>
     </form>
 
     {%- if search.performed -%}
       {%- if search.results_count > 0 -%}
-        <p class="search__count">{{ 'general.search.results_with_count' | t: count: search.results_count, terms: search.terms }}</p>
-        <div class="product-grid product-grid--cols-3">
-          {%- for item in search.results -%}
-            {%- if item.object_type == 'product' -%}
-              {% render 'product-card', product: item %}
-            {%- endif -%}
-          {%- endfor -%}
-        </div>
+        <p class="search-count">{{ 'general.search.results_with_count' | t: count: search.results_count, terms: search.terms }}</p>
+        {%- paginate search.results by 24 -%}
+          <div class="pgrid pgrid-4">
+            {%- for item in search.results -%}
+              {%- if item.object_type == 'product' -%}
+                {% render 'product-card', product: item %}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          {%- if paginate.pages > 1 -%}
+            <nav class="pagination" aria-label="Pagination">
+              {%- if paginate.previous -%}<a href="{{ paginate.previous.url }}">←</a>{%- endif -%}
+              {%- for part in paginate.parts -%}
+                {%- if part.is_link -%}<a href="{{ part.url }}">{{ part.title }}</a>
+                {%- else -%}<span{% if part.title == paginate.current_page %} class="is-current"{% endif %}>{{ part.title }}</span>{%- endif -%}
+              {%- endfor -%}
+              {%- if paginate.next -%}<a href="{{ paginate.next.url }}">→</a>{%- endif -%}
+            </nav>
+          {%- endif -%}
+        {%- endpaginate -%}
       {%- else -%}
-        <p class="empty">{{ 'general.search.no_results' | t: terms: search.terms }}</p>
+        <p class="sect-blurb" style="padding:48px 0">{{ 'general.search.no_results' | t: terms: search.terms }}</p>
       {%- endif -%}
     {%- endif -%}
   </div>
-</section>
+</main>
 
 {% schema %}
-{
-  "name": "Search"
-}
+{ "name": "Search" }
 {% endschema %}

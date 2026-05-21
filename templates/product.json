@@ -4,11 +4,12 @@
     "related": {
       "type": "featured-collection",
       "settings": {
-        "eyebrow": "More armor",
+        "eyebrow": "FROM THE PACK",
         "heading": "You might also like",
         "collection": "all",
         "limit": 4,
-        "cols": "4"
+        "cols": "4",
+        "cta_label": "View all →"
       }
     }
   },

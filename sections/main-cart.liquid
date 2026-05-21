@@ -1,73 +1,141 @@
-<section class="cart" data-section-id="{{ section.id }}">
+{%- assign threshold = section.settings.free_ship_threshold | times: 100 -%}
+<main class="cart-page" data-section-id="{{ section.id }}">
   <div class="container">
-    <header class="cart__head">
-      <h1 class="cart__title">{{ 'cart.title' | t }}</h1>
+    <header class="cart-head">
+      <p class="eyebrow">YOUR PACK</p>
+      <h1 class="cart-title">
+        Cart{% if cart.item_count > 0 %} · <span style="color:var(--ash)">{{ cart.item_count }} {% if cart.item_count == 1 %}piece{% else %}pieces{% endif %}</span>{% endif %}
+      </h1>
     </header>
 
-    {%- if cart.item_count > 0 -%}
-      <form action="{{ routes.cart_url }}" method="post" class="cart__form" novalidate>
-        <table class="cart__table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>{{ 'cart.quantity' | t }}</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {%- for item in cart.items -%}
-              <tr class="cart__row">
-                <td class="cart__product">
-                  <a href="{{ item.url }}" class="cart__media">
-                    {%- if item.image -%}
-                      <img src="{{ item.image | image_url: width: 220 }}" alt="{{ item.title | escape }}" width="110" height="110" loading="lazy">
-                    {%- endif -%}
-                  </a>
-                  <div class="cart__detail">
-                    <a href="{{ item.url }}" class="cart__name">{{ item.product.title }}</a>
-                    {%- unless item.product.has_only_default_variant -%}
-                      <small class="cart__variant">{{ item.variant.title }}</small>
-                    {%- endunless -%}
-                    <small class="cart__price">{{ item.final_price | money }}</small>
-                  </div>
-                </td>
-                <td class="cart__qty-cell">
-                  <input type="number"
-                    name="updates[]"
-                    value="{{ item.quantity }}"
-                    min="0"
-                    inputmode="numeric"
-                    aria-label="{{ 'accessibility.quantity' | t }}">
-                  <a href="{{ item.url_to_remove }}" class="cart__remove">{{ 'cart.remove' | t }}</a>
-                </td>
-                <td class="cart__line-total">{{ item.final_line_price | money }}</td>
-              </tr>
-            {%- endfor -%}
-          </tbody>
-        </table>
-
-        <div class="cart__footer">
-          <div class="cart__totals">
-            <div><span>{{ 'cart.subtotal' | t }}</span><strong>{{ cart.total_price | money }}</strong></div>
-            <p class="cart__note">{{ 'cart.taxes_and_shipping' | t }}</p>
-          </div>
-          <div class="cart__actions">
-            <button type="submit" name="update" class="btn btn--outline">Update</button>
-            <button type="submit" name="checkout" class="btn btn--solid">{{ 'cart.checkout' | t }}</button>
-          </div>
+    {%- if cart.item_count == 0 -%}
+      <div class="cart-empty-page">
+        <p class="empty-h">{{ 'cart.empty' | t }}</p>
+        <p class="empty-p">Nothing in the pack yet. Enter the armory and pick your armor.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a href="/collections/heavy-armor" class="btn btn-fill">Heavy Armor →</a>
+          <a href="{{ routes.root_url }}" class="btn btn-ghost">Back to home</a>
         </div>
-      </form>
-    {%- else -%}
-      <div class="cart__empty">
-        <p>{{ 'cart.empty' | t }}</p>
-        <a href="{{ routes.collections_url }}" class="btn btn--solid">{{ 'cart.continue_shopping' | t }}</a>
       </div>
+    {%- else -%}
+      <form action="{{ routes.cart_url }}" method="post" id="cart-form" class="cart-layout">
+        <section class="cart-list">
+          <div class="cart-list-head">
+            <span>PIECE</span>
+            <span style="text-align:center">QTY</span>
+            <span style="text-align:right">TOTAL</span>
+          </div>
+
+          {%- for line in cart.items -%}
+            <article class="cart-line" data-line-key="{{ line.key }}">
+              <div class="cart-line-product">
+                <a href="{{ line.url }}" class="cart-line-media">
+                  {%- if line.image -%}
+                    <img src="{{ line.image | image_url: width: 240 }}" alt="{{ line.image.alt | escape | default: line.product.title }}" width="104" height="139" loading="lazy">
+                  {%- endif -%}
+                </a>
+                <div class="cart-line-meta">
+                  <a href="{{ line.url }}" class="cart-line-name">{{ line.product.title }}</a>
+                  {%- unless line.product.has_only_default_variant -%}
+                    <p class="cart-line-variant">
+                      {%- for opt in line.options_with_values -%}{{ opt.value }}{% unless forloop.last %} · {% endunless %}{%- endfor -%}
+                    </p>
+                  {%- endunless -%}
+                  <p class="cart-line-price">{{ line.final_price | money }}</p>
+                  <div style="display:flex;gap:16px;margin-top:8px">
+                    <button type="button" class="cart-link" data-cart-remove="{{ line.key }}">Remove</button>
+                  </div>
+                </div>
+              </div>
+              <div class="cart-line-qty">
+                <div class="qty qty-sm">
+                  <button type="button" data-cart-qty-down data-key="{{ line.key }}" aria-label="Decrease">−</button>
+                  <input type="number" name="updates[]" min="0" value="{{ line.quantity }}" data-key="{{ line.key }}" aria-label="Quantity">
+                  <button type="button" data-cart-qty-up data-key="{{ line.key }}" aria-label="Increase">+</button>
+                </div>
+              </div>
+              <div class="cart-line-total">{{ line.final_line_price | money }}</div>
+            </article>
+          {%- endfor -%}
+
+          <div class="cart-list-foot">
+            <a href="/collections/all" class="cart-link">← Continue shopping</a>
+          </div>
+        </section>
+
+        <aside class="cart-summary">
+          {%- if threshold > 0 -%}
+            <div class="ship-progress">
+              {%- if cart.total_price >= threshold -%}
+                <p class="ship-msg done">✦ FREE SHIPPING UNLOCKED</p>
+              {%- else -%}
+                {%- assign remaining = threshold | minus: cart.total_price -%}
+                <p class="ship-msg">{{ remaining | money_without_trailing_zeros }} more for free packwide shipping</p>
+              {%- endif -%}
+              <div class="ship-bar"><div class="ship-fill" style="width:{{ cart.total_price | times: 100.0 | divided_by: threshold | at_most: 100 }}%"></div></div>
+            </div>
+          {%- endif -%}
+
+          <h3 class="summary-h">Order summary</h3>
+          <div class="summary-rows">
+            <div><span>Subtotal</span><span>{{ cart.items_subtotal_price | money }}</span></div>
+            {%- for d in cart.cart_level_discount_applications -%}
+              <div><span>{{ d.title }}</span><span>−{{ d.total_allocated_amount | money }}</span></div>
+            {%- endfor -%}
+            <div><span>Shipping</span><span>Calc. at checkout</span></div>
+          </div>
+          <div class="summary-total"><span>Total</span><span>{{ cart.total_price | money_with_currency }}</span></div>
+
+          <details class="summary-promo">
+            <summary>+ Add promo code</summary>
+            <p style="margin:12px 0 0;color:var(--ash);font-family:var(--f-mono);font-size:11px;letter-spacing:.1em">Promo codes are applied at checkout.</p>
+          </details>
+
+          <button type="submit" name="checkout" class="btn btn-blood btn-block" style="margin-top:20px">
+            Checkout — {{ cart.total_price | money }}
+          </button>
+
+          <ul class="summary-trust">
+            <li>↺ Free returns within 30 days</li>
+            <li>✦ Printed &amp; sewn to order</li>
+            <li>⌂ Carbon-neutral shipping</li>
+          </ul>
+
+          <div class="summary-pay">
+            <p class="meta" style="color:var(--ash);margin:0 0 8px">WE TAKE</p>
+            <div class="pay-row">
+              {%- for chip in section.settings.pay_chips | split: ',' -%}
+                <span class="pay-chip">{{ chip | strip }}</span>
+              {%- endfor -%}
+            </div>
+          </div>
+        </aside>
+      </form>
+
+      {%- assign rec = collections[section.settings.recommend_collection] -%}
+      {%- if rec.products.size > 0 -%}
+        <section class="cart-related">
+          <header class="sect-head">
+            <div><p class="eyebrow">FROM THE PACK</p><h2 class="sect-h">Pair it with</h2></div>
+          </header>
+          <div class="pgrid pgrid-4">
+            {%- for product in rec.products limit: 4 -%}
+              {% render 'product-card', product: product %}
+            {%- endfor -%}
+          </div>
+        </section>
+      {%- endif -%}
     {%- endif -%}
   </div>
-</section>
+</main>
 
 {% schema %}
 {
-  "name": "Cart"
+  "name": "Cart",
+  "settings": [
+    { "type": "number", "id": "free_ship_threshold", "label": "Free shipping threshold ($)", "default": 120 },
+    { "type": "collection", "id": "recommend_collection", "label": "\"Pair it with\" collection" },
+    { "type": "text", "id": "pay_chips", "label": "Payment chips (comma-separated)", "default": "VISA, MC, AMEX, SHOP, PAYPAL, KLARNA" }
+  ]
 }
 {% endschema %}

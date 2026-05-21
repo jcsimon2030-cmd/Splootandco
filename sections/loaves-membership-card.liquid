@@ -1,0 +1,62 @@
+<section class="loaves-card-block" data-section-id="{{ section.id }}">
+  <div class="container loaves-card-grid">
+    <div class="loaves-card">
+      <div class="loaves-card-top">
+        <span class="loaves-card-id">No. 00 / {{ section.settings.card_number | default: '0001' }}</span>
+        <span style="color:var(--bone)">{% render 'icon-crest', crest_size: 60 %}</span>
+      </div>
+      <h3 class="loaves-card-name">{{ section.settings.card_name }}</h3>
+      <p class="loaves-card-sub">{{ section.settings.card_role }}</p>
+      <div class="loaves-card-row">
+        <div>
+          <p class="meta" style="color:var(--ash)">MEMBER</p>
+          <p class="loaves-card-val">{% if customer %}{{ customer.name | upcase }}{% else %}[YOUR NAME]{% endif %}</p>
+        </div>
+        <div>
+          <p class="meta" style="color:var(--ash)">SINCE</p>
+          <p class="loaves-card-val">{{ 'now' | date: '%Y' }}</p>
+        </div>
+      </div>
+      <p class="loaves-card-foot">{{ section.settings.card_quote }}</p>
+    </div>
+
+    <div class="loaves-card-cta">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="eyebrow" style="color:var(--blood)">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2 class="loaves-card-h">{{ section.settings.heading }}</h2>
+      <div class="loaves-card-p rte">{{ section.settings.body }}</div>
+
+      {%- form 'customer', class: 'loaves-form' -%}
+        <input type="hidden" name="contact[tags]" value="loaves-napping-club">
+        {%- if form.posted_successfully? -%}
+          <p class="loaves-joined">{{ section.settings.success }}</p>
+        {%- else -%}
+          <input type="email" name="contact[email]" required placeholder="{{ section.settings.placeholder }}">
+          <button class="btn btn-blood" type="submit">{{ section.settings.cta_label }}</button>
+        {%- endif -%}
+      {%- endform -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Loaves membership card",
+  "settings": [
+    { "type": "header", "content": "Card face" },
+    { "type": "text", "id": "card_number", "label": "Card number", "default": "0001" },
+    { "type": "text", "id": "card_name", "label": "Card name", "default": "LOAVES NAPPING CLUB" },
+    { "type": "text", "id": "card_role", "label": "Card subtitle", "default": "CARD-CARRYING MEMBER" },
+    { "type": "text", "id": "card_quote", "label": "Footer quote", "default": "\"THE FIRST TIME YOU PUT IT ON, YOU'RE IN.\"" },
+    { "type": "header", "content": "Join CTA" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "JOIN THE PACK" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "No application. No fees. No bullshit." },
+    { "type": "richtext", "id": "body", "label": "Body", "default": "<p>Membership is free. Initiation is automatic. The first time you put it on, you're in. Subscribe for first looks, drops, and packwide field notes.</p>" },
+    { "type": "text", "id": "placeholder", "label": "Input placeholder", "default": "you@somewhere.com" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Initiate →" },
+    { "type": "text", "id": "success", "label": "Success message", "default": "✦ YOU'RE IN. WELCOME TO THE PACK." }
+  ],
+  "presets": [{ "name": "Loaves membership card" }]
+}
+{% endschema %}

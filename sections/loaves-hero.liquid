@@ -1,33 +1,30 @@
-<section
-  class="loaves-hero{% if section.settings.bg_image %} loaves-hero--has-bg{% endif %}"
-  data-section-id="{{ section.id }}"
-  {% if section.settings.bg_image %}style="background-image:url('{{ section.settings.bg_image | image_url: width: 2400 }}');"{% endif %}>
+<section class="loaves-hero" data-section-id="{{ section.id }}">
+  <div class="loaves-hero-photo">
+    {%- if section.settings.bg_image -%}
+      <img src="{{ section.settings.bg_image | image_url: width: 2400 }}" alt="" loading="eager">
+    {%- else -%}
+      <div class="photo photo-rust photo-figure"><div class="silhouette"></div></div>
+    {%- endif -%}
+  </div>
+  <div class="loaves-hero-scrim"></div>
 
-  <div class="loaves-hero__scrim"></div>
-
-  <div class="container loaves-hero__inner">
-    <p class="loaves-hero__crest">✦ EST. 2025 ✦</p>
-
-    <h1 class="loaves-hero__title">
-      <span>Loaves</span>
-      <span class="loaves-hero__title-accent">Napping</span>
-      <span>Club</span>
+  <div class="container loaves-hero-inner">
+    <p class="loaves-crest">★ {{ section.settings.crest_text }} ★</p>
+    <h1 class="loaves-title">
+      <span>{{ section.settings.title_1 }}</span>
+      <span class="loaves-title-accent">{{ section.settings.title_2 }}</span>
+      <span>{{ section.settings.title_3 }}</span>
     </h1>
-
-    <p class="loaves-hero__sub">{{ section.settings.tagline }}</p>
-
-    <div class="loaves-hero__meta">
-      <span>Member 001 · You</span>
-      <span>·</span>
-      <span>Pack strength: rising</span>
-    </div>
+    <p class="loaves-sub">{{ section.settings.tagline }}</p>
+    {%- if section.settings.meta != blank -%}
+      <div class="loaves-meta">{{ section.settings.meta }}</div>
+    {%- endif -%}
   </div>
 
-  <div class="loaves-hero__ticker" aria-hidden="true">
-    <div class="loaves-hero__track">
-      {%- for i in (1..6) -%}
-        <span>{{ section.settings.ticker_text }}</span>
-        <span class="loaves-hero__bullet">✦</span>
+  <div class="loaves-ticker" aria-hidden="true">
+    <div class="loaves-ticker-track">
+      {%- for i in (1..8) -%}
+        <span style="display:inline-flex;gap:32px;align-items:center"><span>{{ section.settings.ticker_text }}</span><span class="loaves-bullet">✦</span></span>
       {%- endfor -%}
     </div>
   </div>
@@ -38,15 +35,14 @@
   "name": "Loaves hero",
   "settings": [
     { "type": "image_picker", "id": "bg_image", "label": "Background image" },
-    { "type": "text",         "id": "tagline",
-      "label": "Tagline",
-      "default": "Heaven sent. Hell on your personal space. The official society for soft hearts in heavy armor." },
-    { "type": "text",         "id": "ticker_text",
-      "label": "Ticker text",
-      "default": "WE ARE THE PACK" }
+    { "type": "text", "id": "crest_text", "label": "Crest line", "default": "MEMBERSHIP IS FREE · INITIATION IS AUTOMATIC" },
+    { "type": "text", "id": "title_1", "label": "Title line 1", "default": "LOAVES" },
+    { "type": "text", "id": "title_2", "label": "Title line 2 (accent)", "default": "napping" },
+    { "type": "text", "id": "title_3", "label": "Title line 3", "default": "CLUB" },
+    { "type": "textarea", "id": "tagline", "label": "Tagline", "default": "Heaven sent. Hell on your personal space. The official society for soft hearts in heavy armor." },
+    { "type": "text", "id": "meta", "label": "Meta line", "default": "EST · MMXXIV · OAK PARK, IL · CHAPTER 001" },
+    { "type": "text", "id": "ticker_text", "label": "Ticker text", "default": "WE ARE THE PACK" }
   ],
-  "presets": [
-    { "name": "Loaves hero" }
-  ]
+  "presets": [{ "name": "Loaves hero" }]
 }
 {% endschema %}
